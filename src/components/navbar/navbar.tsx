@@ -1,17 +1,24 @@
+import Image from "next/image";
 import { GiComb } from "react-icons/gi";
 import { HiMiniScissors } from "react-icons/hi2";
 
 const Navbar = () => {
   return (
-    <nav>
-      <ul>
-        <li>
+    <nav className="bg-white shadow-md py-4 px-6">
+      <ul className="flex items-center justify-center gap-10 md:gap-20">
+        <li className="text-3xl text-gray-700 hover:text-black transition duration-300">
           <GiComb />
         </li>
         <li>
-          <span>Barbearia</span>
+          <Image
+            src="/img/logo.jpg"
+            alt="Logo do Artista do corte"
+            width={70}
+            height={70}
+            className="rounded-full object-cover"
+          />
         </li>
-        <li>
+        <li className="text-3xl text-gray-700 hover:text-black transition duration-300">
           <HiMiniScissors />
         </li>
       </ul>

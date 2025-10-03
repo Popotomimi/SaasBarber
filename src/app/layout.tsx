@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Artista do Corte",
   description: "Faça seu agendamento",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -26,16 +29,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <header>
-        <Navbar />
-      </header>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <header>
+          <Navbar />
+        </header>
         {children}
-      </body>
-      <footer>
         <Footer />
-      </footer>
+      </body>
     </html>
   );
 }
