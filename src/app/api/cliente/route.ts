@@ -1,6 +1,75 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { ClienteModel } from "@/models/Cliente";
+import { HistoryModel } from "@/models/History";
+import { DateTime } from "luxon";
+
+export async function POST(req: NextRequest) {
+  await connectToDatabase();
+
+  const body = await req.json();
+  const { name, date, time, service, barber, phone } = body;
+
+  if (!name || !date || !time || !service || !barber || !phone) {
+    return NextResponse.json(
+      { message: "Todos os campos são obrigatórios!" },
+      { status: 422 }
+    );
+  }
+
+  try {
+    const dataAtual = DateTime.now().setZone("America/Sao_Paulo");
+    const dataAgendada = DateTime.fromISO(`${date}T${time}`, {
+      zone: "America/Sao_Paulo",
+    });
+
+    if (!dataAgendada.isValid || dataAgendada <= dataAtual) {
+      return NextResponse.json(
+        { message: "A data e o horário devem ser no futuro!" },
+        { status: 422 }
+      );
+    }
+
+    const cliente = await ClienteModel.create({
+      name,
+      date,
+      time,
+      service,
+      barber,
+      phone,
+    });
+
+    const historyExistente = await HistoryModel.findOne({ phone });
+
+    if (historyExistente) {
+      historyExistente.amount = (historyExistente.amount ?? 0) + 1;
+      historyExistente.dates.push(dataAgendada.toJSDate());
+      historyExistente.services.push(service);
+      historyExistente.barbers.push(barber);
+      historyExistente.times.push(time);
+      await historyExistente.save();
+    } else {
+      await HistoryModel.create({
+        name: cliente.name,
+        phone: cliente.phone,
+        amount: 1,
+        dates: [dataAgendada.toJSDate()],
+        times: [time],
+        services: [service],
+        barbers: [barber],
+      });
+    }
+
+    return NextResponse.json(cliente, { status: 201 });
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : "Erro desconhecido!";
+    console.error(`Erro no sistema: ${errorMessage}`);
+    return NextResponse.json(
+      { error: "Por favor, tente mais tarde!" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function GET() {
   try {

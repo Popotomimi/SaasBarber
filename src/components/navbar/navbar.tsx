@@ -4,21 +4,21 @@ import { HiMiniScissors } from "react-icons/hi2";
 
 const Navbar = () => {
   return (
-    <nav className="bg-white shadow-md py-4 px-6">
+    <nav className="shadow-md py-4 px-6">
       <ul className="flex items-center justify-center gap-10 md:gap-20">
-        <li className="text-3xl text-gray-700 hover:text-black transition duration-300">
+        <li className="text-3xl text-blue-400 hover:text-black transition duration-300">
           <GiComb />
         </li>
         <li>
           <Image
             src="/img/logo.jpg"
             alt="Logo do Artista do corte"
-            width={70}
-            height={70}
+            width={60}
+            height={60}
             className="rounded-full object-cover"
           />
         </li>
-        <li className="text-3xl text-gray-700 hover:text-black transition duration-300">
+        <li className="text-3xl text-blue-400 hover:text-black transition duration-300">
           <HiMiniScissors />
         </li>
       </ul>

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { barbers } from "@/db/barbers";
 import { services } from "@/db/services";
+import { toast } from "react-toastify";
 
 const FormSchedule = () => {
   const form = useForm<z.infer<typeof scheduleSchema>>({
@@ -38,13 +39,40 @@ const FormSchedule = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof scheduleSchema>) {
-    console.log("Dados do agendamento:", values);
-    window.alert(JSON.stringify(values, null, 2));
+  async function onSubmit(values: z.infer<typeof scheduleSchema>) {
+    const payload = {
+      name: values.name,
+      date: values.date,
+      time: values.hora,
+      service: values.service,
+      barber: values.barber,
+      phone: values.phoneNumber,
+    };
+
+    try {
+      const res = await fetch("/api/cliente", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Erro ao agendar. Tente novamente.");
+        return;
+      }
+
+      toast.success("Agendamento realizado com sucesso!");
+      form.reset();
+    } catch (error) {
+      console.error("Erro ao enviar agendamento:", error);
+      toast.error("Erro inesperado. Tente novamente mais tarde.");
+    }
   }
 
   return (
-    <section className="w-full px-6 py-12 bg-[#f3f3f3] flex justify-center">
+    <section className="w-full px-6 py-12 flex justify-center">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
