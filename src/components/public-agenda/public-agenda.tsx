@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import Cliente from "../../interfaces/Cliente";
 import { LuMessageCircleWarning } from "react-icons/lu";
+import extractDuration from "../utils/agenda/extractDuration";
+import calculateEndTime from "../utils/agenda/calculateEndTime";
+import calculateSchedule from "../utils/agenda/calculateSchedule";
+import { fetchClientes } from "../utils/form/fetchClientes";
 import "react-calendar/dist/Calendar.css";
 
 const PublicAgenda = () => {
@@ -10,83 +14,38 @@ const PublicAgenda = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const startTime = "09:00";
   const endTime = "21:00";
-
-  useEffect(() => {
-    const fetchClientes = async () => {
-      try {
-        const res = await fetch("/api/cliente");
-        const data = await res.json();
-        setClientes(data);
-      } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
-      }
-    };
-    fetchClientes();
-  }, []);
+  const selectedBarber = "Artista do Corte";
 
   const selectedDateStr = selectedDate.toISOString().split("T")[0];
 
-  const filteredClientes = clientes.filter(
-    (cliente) =>
-      cliente.barber === "Artista do Corte" && cliente.date === selectedDateStr
-  );
+  useEffect(() => {
+    fetchClientes().then(setClientes);
 
-  const extractDuration = (service: string): number | null => {
-    const match = service.match(/\((\d+)min\)/);
-    return match ? parseInt(match[1], 10) : null;
-  };
+    const handleUpdate = () => {
+      fetchClientes().then(setClientes);
+    };
 
-  const calculateEndTime = (startTime: string, duration: number | null) => {
-    const [hours, minutes] = startTime.split(":").map(Number);
-    const totalMinutes = hours * 60 + minutes + (duration || 0);
-    const endHours = Math.floor(totalMinutes / 60);
-    const endMinutes = totalMinutes % 60;
-    return `${endHours.toString().padStart(2, "0")}:${endMinutes
-      .toString()
-      .padStart(2, "0")}`;
-  };
+    window.addEventListener("agendaAtualizada", handleUpdate);
 
-  const calculateSchedule = (
-    clientes: Cliente[],
-    startTime: string,
-    endTime: string
-  ) => {
-    const occupiedSlots = clientes.map((cliente) => {
-      const duration = extractDuration(cliente.service);
-      const slotEndTime = calculateEndTime(cliente.time, duration);
-      return { start: cliente.time, end: slotEndTime, type: "occupied" };
-    });
+    return () => {
+      window.removeEventListener("agendaAtualizada", handleUpdate);
+    };
+  }, []);
 
-    occupiedSlots.sort((a, b) => a.start.localeCompare(b.start));
-
-    const schedule = [];
-    let lastEndTime = startTime;
-
-    for (const slot of occupiedSlots) {
-      if (slot.start > lastEndTime) {
-        schedule.push({
-          start: lastEndTime,
-          end: slot.start,
-          type: "available",
-        });
-      }
-      schedule.push(slot);
-      lastEndTime = slot.end;
-    }
-
-    if (lastEndTime < endTime) {
-      schedule.push({ start: lastEndTime, end: endTime, type: "available" });
-    }
-
-    return schedule;
-  };
+  const filteredClientes = clientes.filter((cliente) => {
+    const clienteDateStr = new Date(cliente.date).toISOString().split("T")[0];
+    return (
+      cliente.barber === selectedBarber && clienteDateStr === selectedDateStr
+    );
+  });
 
   return (
     <section className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4 text-center">Agenda</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center text-white">Agenda</h2>
 
       <div className="mb-6 flex justify-center">
         <Calendar
+          locale="pt-BR"
           onChange={(value) => {
             if (value instanceof Date) {
               setSelectedDate(value);
@@ -94,7 +53,7 @@ const PublicAgenda = () => {
           }}
           value={selectedDate}
           minDate={new Date()}
-          className="rounded-lg shadow-md p-4 bg-white"
+          className="react-calendar w-full max-w-md bg-[#1a1a1a] text-white rounded-lg p-4 shadow-md [&_.react-calendar__tile]:rounded-md [&_.react-calendar__tile]:p-2 [&_.react-calendar__tile]:text-sm [&_.react-calendar__tile]:text-gray-300 [&_.react-calendar__tile--active]:bg-blue-400 [&_.react-calendar__tile--active]:text-white [&_.react-calendar__tile:hover]:bg-[#333] [&_.react-calendar__navigation]:mb-4 [&_.react-calendar__navigation__label]:text-white [&_.react-calendar__navigation__arrow]:text-white [&_.react-calendar__month-view__weekdays]:text-gray-400 [&_.react-calendar__month-view__weekdays]:uppercase [&_.react-calendar__month-view__weekdays]:text-xs"
           tileClassName={({ date }) =>
             date.toISOString().split("T")[0] === selectedDateStr
               ? "bg-blue-500 text-white rounded-md"
@@ -103,17 +62,17 @@ const PublicAgenda = () => {
         />
       </div>
 
-      <p className="text-center text-sm mb-2">
+      <p className="text-center text-sm mb-2 text-white">
         <strong>Horário de funcionamento:</strong> {startTime} às {endTime}
       </p>
 
       {filteredClientes.length === 0 ? (
         <div className="text-center text-gray-500">
           <p className="mb-2">Nenhum horário ocupado</p>
-          <LuMessageCircleWarning className="mx-auto text-3xl" />
+          <LuMessageCircleWarning className="mx-auto text-9xl text-blue-400" />
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2 mb-7">
           {calculateSchedule(filteredClientes, startTime, endTime).map(
             (slot, index) => (
               <div

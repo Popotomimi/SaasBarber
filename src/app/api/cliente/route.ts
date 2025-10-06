@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { ClienteModel } from "@/models/Cliente";
 import { HistoryModel } from "@/models/History";
 import { DateTime } from "luxon";
+import { services } from "@/db/services";
 
 export async function POST(req: NextRequest) {
   await connectToDatabase();
@@ -28,6 +29,37 @@ export async function POST(req: NextRequest) {
         { message: "A data e o horário devem ser no futuro!" },
         { status: 422 }
       );
+    }
+
+    const agendamentosExistentes = await ClienteModel.find({ date, barber });
+
+    const novoInicio = DateTime.fromISO(`${date}T${time}`, {
+      zone: "America/Sao_Paulo",
+    });
+    const novoFim = novoInicio.plus({
+      minutes: services.find((s) => s.name === service)?.duration || 0,
+    });
+
+    for (const ag of agendamentosExistentes) {
+      const inicioExistente = DateTime.fromISO(`${ag.date}T${ag.time}`, {
+        zone: "America/Sao_Paulo",
+      });
+      const fimExistente = inicioExistente.plus({
+        minutes: services.find((s) => s.name === ag.service)?.duration || 0,
+      });
+
+      const sobrepoe = novoInicio < fimExistente && novoFim > inicioExistente;
+
+      if (sobrepoe) {
+        return NextResponse.json(
+          {
+            message: `Conflito com agendamento de ${
+              ag.time
+            } até ${fimExistente.toFormat("HH:mm")}`,
+          },
+          { status: 409 }
+        );
+      }
     }
 
     const cliente = await ClienteModel.create({
