@@ -10,6 +10,10 @@
   border-radius: 0.375rem;
 }
 
+.react-calendar__tile--now {
+  background-color: #666 !important;
+}
+
 .react-calendar__navigation button:disabled {
   color: #555;
   cursor: not-allowed;

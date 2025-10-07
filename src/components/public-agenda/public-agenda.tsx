@@ -16,7 +16,13 @@ const PublicAgenda = () => {
   const endTime = "21:00";
   const selectedBarber = "Artista do Corte";
 
-  const selectedDateStr = selectedDate.toISOString().split("T")[0];
+  // ✅ Corrigido: evita UTC e gera "YYYY-MM-DD" localmente
+  const selectedDateStr =
+    selectedDate.getFullYear() +
+    "-" +
+    String(selectedDate.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(selectedDate.getDate()).padStart(2, "0");
 
   useEffect(() => {
     fetchClientes().then(setClientes);
@@ -33,9 +39,8 @@ const PublicAgenda = () => {
   }, []);
 
   const filteredClientes = clientes.filter((cliente) => {
-    const clienteDateStr = new Date(cliente.date).toISOString().split("T")[0];
     return (
-      cliente.barber === selectedBarber && clienteDateStr === selectedDateStr
+      cliente.barber === selectedBarber && cliente.date === selectedDateStr
     );
   });
 
@@ -54,11 +59,17 @@ const PublicAgenda = () => {
           value={selectedDate}
           minDate={new Date()}
           className="react-calendar w-full max-w-md bg-[#1a1a1a] text-white rounded-lg p-4 shadow-md [&_.react-calendar__tile]:rounded-md [&_.react-calendar__tile]:p-2 [&_.react-calendar__tile]:text-sm [&_.react-calendar__tile]:text-gray-300 [&_.react-calendar__tile--active]:bg-blue-400 [&_.react-calendar__tile--active]:text-white [&_.react-calendar__tile:hover]:bg-[#333] [&_.react-calendar__navigation]:mb-4 [&_.react-calendar__navigation__label]:text-white [&_.react-calendar__navigation__arrow]:text-white [&_.react-calendar__month-view__weekdays]:text-gray-400 [&_.react-calendar__month-view__weekdays]:uppercase [&_.react-calendar__month-view__weekdays]:text-xs"
-          tileClassName={({ date }) =>
-            date.toISOString().split("T")[0] === selectedDateStr
+          tileClassName={({ date }) => {
+            const dateStr =
+              date.getFullYear() +
+              "-" +
+              String(date.getMonth() + 1).padStart(2, "0") +
+              "-" +
+              String(date.getDate()).padStart(2, "0");
+            return dateStr === selectedDateStr
               ? "bg-blue-500 text-white rounded-md"
-              : "hover:bg-blue-100 rounded-md"
-          }
+              : "hover:bg-blue-100 rounded-md";
+          }}
         />
       </div>
 
