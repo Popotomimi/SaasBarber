@@ -123,7 +123,7 @@ const AdminAgenda = () => {
   );
 
   return (
-    <section id="agenda" className="max-w-3xl mx-auto p-4">
+    <section id="agendas" className="max-w-3xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-center text-white">Agenda</h2>
 
       <div className="mb-6 flex justify-center">
@@ -193,12 +193,12 @@ const AdminAgenda = () => {
                   <div className="flex justify-between mt-5 pt-5 border-t-1 border-gray-300">
                     <button
                       onClick={() => handleEdit(cliente)}
-                      className="px-2 py-1 bg-blue-400 text-white rounded text-sm">
+                      className="px-2 py-1 cursor-pointer bg-blue-400 hover:bg-blue-500 text-white rounded text-sm">
                       Editar
                     </button>
                     <button
                       onClick={() => handleDelete(cliente._id)}
-                      className="px-2 py-1 bg-red-500 text-white rounded text-sm">
+                      className="px-2 py-1 cursor-pointer bg-red-500 hover:bg-red-600 text-white rounded text-sm">
                       Excluir
                     </button>
                   </div>

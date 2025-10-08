@@ -1,8 +1,8 @@
 "use client";
 import AdminAgenda from "@/components/admin-agenda/admin-agenda";
 import AdminFormSchedule from "@/components/admin-form-schedule/admin-form-schedule";
+import BloqueioCard from "@/components/bloqueio-card/bloqueio-card";
 import FormBlock from "@/components/form-block/form-block";
-import QRPage from "@/components/qrcode/qrcode";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,19 +28,23 @@ export default function AdminPage() {
           <Button
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
             asChild>
-            <Link href="#agenda">Agenda</Link>
+            <Link href="#agendas">Agenda</Link>
           </Button>
           <Button
-            className="bg-zinc-950 hover:bg-zinc-800 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
             asChild>
             <Link href="#block">Bloquear Agenda</Link>
           </Button>
           <Button
-            className="bg-green-700 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
             asChild>
             <Link href="/admin/whatsapp">WhatsApp</Link>
           </Button>
-
+          <Button
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            asChild>
+            <Link href="/admin/historico">Hitorico de Clientes</Link>
+          </Button>
           <Button
             onClick={handleLogout}
             className="bg-red-600 cursor-pointer hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
@@ -60,6 +64,7 @@ export default function AdminPage() {
         className="w-full max-w-screen-md border-t border-gray-700 py-12"
         id="block">
         <FormBlock />
+        <BloqueioCard />
       </div>
 
       <div className="w-full max-w-screen-md border-t border-gray-700 py-12">

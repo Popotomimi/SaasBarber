@@ -56,3 +56,7 @@ export async function disconnectWhatsApp(): Promise<boolean> {
 export function getQRStatus(): { qr: string | null; connected: boolean } {
   return { qr: currentQR, connected: isConnected };
 }
+
+export function isWhatsAppConnected(): boolean {
+  return isConnected;
+}
