@@ -123,7 +123,7 @@ const AdminAgenda = () => {
   );
 
   return (
-    <section className="max-w-3xl mx-auto p-4">
+    <section id="agenda" className="max-w-3xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-center text-white">Agenda</h2>
 
       <div className="mb-6 flex justify-center">
@@ -183,9 +183,6 @@ const AdminAgenda = () => {
                   </p>
                   <p>
                     <strong>Serviço:</strong> {cliente.service}
-                  </p>
-                  <p>
-                    <strong>Duração:</strong> {cliente.duration} min
                   </p>
                   <p>
                     <strong>Barbeiro:</strong> {cliente.barber}

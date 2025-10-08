@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { ClienteModel } from "@/models/Cliente";
 import { HistoryModel } from "@/models/History";
+import { Bloqueio } from "@/models/Bloqueio";
 import { DateTime } from "luxon";
 import { services } from "@/db/services";
+import { sendWhatsAppMessage } from "@/lib/sendWhatsAppMessage";
 
 export async function POST(req: NextRequest) {
   await connectToDatabase();
@@ -31,11 +33,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 🔒 Verificar bloqueios
+    const bloqueios = await Bloqueio.find({ barber });
+
+    for (const bloqueio of bloqueios) {
+      const inicioBloqueio = DateTime.fromISO(
+        `${bloqueio.startDate}T${bloqueio.startTime}`,
+        {
+          zone: "America/Sao_Paulo",
+        }
+      );
+
+      const fimBloqueio = DateTime.fromISO(
+        `${bloqueio.endDate || bloqueio.startDate}T${bloqueio.endTime}`,
+        {
+          zone: "America/Sao_Paulo",
+        }
+      );
+
+      const dentroDoBloqueio =
+        dataAgendada >= inicioBloqueio && dataAgendada < fimBloqueio;
+
+      if (dentroDoBloqueio) {
+        return NextResponse.json(
+          {
+            message: `Horário indisponível! Agenda bloqueada até ${fimBloqueio.toFormat(
+              "dd/MM/yyyy HH:mm"
+            )}. Motivo: ${bloqueio.motivo}`,
+          },
+          { status: 403 }
+        );
+      }
+    }
+
+    // ⛔ Verificar conflitos com agendamentos existentes
     const agendamentosExistentes = await ClienteModel.find({ date, barber });
 
-    const novoInicio = DateTime.fromISO(`${date}T${time}`, {
-      zone: "America/Sao_Paulo",
-    });
+    const novoInicio = dataAgendada;
     const novoFim = novoInicio.plus({
       minutes: services.find((s) => s.name === service)?.duration || 0,
     });
@@ -44,6 +78,7 @@ export async function POST(req: NextRequest) {
       const inicioExistente = DateTime.fromISO(`${ag.date}T${ag.time}`, {
         zone: "America/Sao_Paulo",
       });
+
       const fimExistente = inicioExistente.plus({
         minutes: services.find((s) => s.name === ag.service)?.duration || 0,
       });
@@ -62,6 +97,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ✅ Criar agendamento
     const cliente = await ClienteModel.create({
       name,
       date,
@@ -71,6 +107,18 @@ export async function POST(req: NextRequest) {
       phone,
     });
 
+    // Enviar mensagem para o cliente
+    const mensagem = `Novo agendamento realizado:\n
+      Nome: ${name}\n
+      Data: ${date}\n
+      Horário: ${time}\n
+      Serviço: ${service}\n
+      Barbeiro: ${barber}\n
+      Telefone do cliente: ${phone}`;
+
+    await sendWhatsAppMessage(mensagem, "5511959533499");
+
+    // 📊 Atualizar histórico
     const historyExistente = await HistoryModel.findOne({ phone });
 
     if (historyExistente) {

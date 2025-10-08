@@ -1,0 +1,27 @@
+2025/10/07-22:08:31.355 3b24 Reusing MANIFEST C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/10/07-22:08:31.355 3b24 Recovering log #267
+2025/10/07-22:08:31.636 3b24 Reusing old log C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000267.log 
+2025/10/07-22:08:33.193 3c40 Level-0 table #279: started
+2025/10/07-22:08:33.229 3c40 Level-0 table #279: 909072 bytes OK
+2025/10/07-22:08:33.233 3c40 Delete type=0 #267
+2025/10/07-22:08:33.234 3c40 Manual compaction at level-0 from '\x00\x1e\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1f\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/10/07-22:08:35.794 3c40 Compacting 1@1 + 8@2 files
+2025/10/07-22:08:35.898 3c40 Generated table #280@1: 43549 keys, 2209243 bytes
+2025/10/07-22:08:35.968 3c40 Generated table #281@1: 12095 keys, 2165266 bytes
+2025/10/07-22:08:36.025 3c40 Generated table #282@1: 2970 keys, 2161327 bytes
+2025/10/07-22:08:36.085 3c40 Generated table #283@1: 8187 keys, 2165368 bytes
+2025/10/07-22:08:36.198 3c40 Generated table #284@1: 29892 keys, 2263378 bytes
+2025/10/07-22:08:36.274 3c40 Generated table #285@1: 19911 keys, 2166822 bytes
+2025/10/07-22:08:36.420 3c40 Generated table #286@1: 99294 keys, 2249224 bytes
+2025/10/07-22:08:36.554 3c40 Generated table #287@1: 77003 keys, 1723160 bytes
+2025/10/07-22:08:36.555 3c40 Compacted 1@1 + 8@2 files => 17103788 bytes
+2025/10/07-22:08:36.558 3c40 compacted to: files[ 0 0 8 0 0 0 0 ]
+2025/10/07-22:08:36.558 3c40 Delete type=2 #269
+2025/10/07-22:08:36.558 3c40 Delete type=2 #270
+2025/10/07-22:08:36.558 3c40 Delete type=2 #271
+2025/10/07-22:08:36.558 3c40 Delete type=2 #272
+2025/10/07-22:08:36.558 3c40 Delete type=2 #273
+2025/10/07-22:08:36.558 3c40 Delete type=2 #274
+2025/10/07-22:08:36.558 3c40 Delete type=2 #275
+2025/10/07-22:08:36.558 3c40 Delete type=2 #276
+2025/10/07-22:08:36.558 3c40 Delete type=2 #279

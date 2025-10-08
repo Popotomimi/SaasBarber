@@ -136,7 +136,7 @@ const AdminFormSchedule = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full max-w-xl bg-[#1a1a1a] p-8 rounded-xl shadow-lg space-y-6">
           <h2 className="text-2xl md:text-3xl font-bold text-blue-400 text-center">
-            Agende o corte para seu cliente
+            Agende para seu cliente
           </h2>
 
           <FormField

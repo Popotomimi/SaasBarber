@@ -102,7 +102,9 @@ const Modal: React.FC<Props> = ({
           <Button variant="secondary" onClick={onClose}>
             Cancelar
           </Button>
-          <Button onClick={onSave}>Salvar</Button>
+          <Button className="bg-blue-400 hover:bg-blue-600" onClick={onSave}>
+            Salvar
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
