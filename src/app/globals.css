@@ -26,6 +26,10 @@
   opacity: 0.6;
 }
 
+.react-calendar {
+  background-color: #1a1a1a !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
