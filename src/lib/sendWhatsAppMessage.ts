@@ -2,7 +2,7 @@ import { initWhatsApp, isWhatsAppConnected } from "./whatsapp";
 
 export async function sendWhatsAppMessage(message: string, number: string) {
   try {
-    const client = initWhatsApp();
+    const client = await initWhatsApp();
 
     if (!isWhatsAppConnected()) {
       throw new Error("WhatsApp ainda não está conectado");

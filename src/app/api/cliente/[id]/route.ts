@@ -1,16 +1,16 @@
-// app/api/cliente/[id]/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { ClienteModel } from "@/models/Cliente";
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectToDatabase();
 
   try {
-    await ClienteModel.findByIdAndDelete(params.id);
+    const { id } = await context.params;
+    await ClienteModel.findByIdAndDelete(id);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return NextResponse.json(
@@ -21,14 +21,15 @@ export async function DELETE(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectToDatabase();
   const body = await request.json();
 
   try {
-    const updated = await ClienteModel.findByIdAndUpdate(params.id, body, {
+    const { id } = await context.params;
+    const updated = await ClienteModel.findByIdAndUpdate(id, body, {
       new: true,
     });
     return NextResponse.json(updated, { status: 200 });

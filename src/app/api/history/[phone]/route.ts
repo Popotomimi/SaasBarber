@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { HistoryModel } from "@/models/History";
 
@@ -8,15 +8,14 @@ function normalizePhone(phone: string): string {
 }
 
 export async function GET(
-  request: Request,
-  context: { params: { phone: string } }
+  request: NextRequest,
+  context: { params: Promise<{ phone: string }> }
 ) {
   await connectToDatabase();
 
   try {
-    // Aguarde explicitamente o acesso ao params
-    const rawPhone = (await Promise.resolve(context.params)).phone;
-    const normalized = normalizePhone(rawPhone);
+    const { phone } = await context.params;
+    const normalized = normalizePhone(phone);
 
     const histories = await HistoryModel.find();
     const filtrados = histories.filter(
