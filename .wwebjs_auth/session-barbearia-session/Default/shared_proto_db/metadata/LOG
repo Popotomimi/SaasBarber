@@ -1,2 +1,3 @@
-2025/10/07-21:12:54.203 1844 Creating DB C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\shared_proto_db\metadata since it was missing.
-2025/10/07-21:12:54.390 1844 Reusing MANIFEST C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\shared_proto_db\metadata/MANIFEST-000001
+2025/10/08-21:18:12.867 4a48 Reusing MANIFEST C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\shared_proto_db\metadata/MANIFEST-000001
+2025/10/08-21:18:12.874 4a48 Recovering log #3
+2025/10/08-21:18:12.874 4a48 Reusing old log C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\shared_proto_db\metadata/000003.log 

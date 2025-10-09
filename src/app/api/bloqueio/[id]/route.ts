@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import { Bloqueio } from "@/models/Bloqueio";
 import { connectToDatabase } from "@/lib/mongodb";
 
-export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(_: Request, context: { params: { id: string } }) {
   await connectToDatabase();
+
   try {
-    const bloqueioRemovido = await Bloqueio.findByIdAndDelete(params.id);
+    const { id } = await Promise.resolve(context.params);
+    const bloqueioRemovido = await Bloqueio.findByIdAndDelete(id);
 
     if (!bloqueioRemovido) {
       return NextResponse.json(

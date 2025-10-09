@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, models, Schema } from "mongoose";
 
 const bloqueioSchema = new Schema(
   {
@@ -14,4 +14,5 @@ const bloqueioSchema = new Schema(
   }
 );
 
-export const Bloqueio = model("BloqueioModel", bloqueioSchema);
+export const Bloqueio =
+  models.BloqueioModel || model("BloqueioModel", bloqueioSchema);

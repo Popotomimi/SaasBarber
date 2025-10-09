@@ -6,6 +6,7 @@ import { Bloqueio } from "@/models/Bloqueio";
 import { DateTime } from "luxon";
 import { services } from "@/db/services";
 import { sendWhatsAppMessage } from "@/lib/sendWhatsAppMessage";
+import { initWhatsApp, isWhatsAppConnected } from "@/lib/whatsapp";
 
 export async function POST(req: NextRequest) {
   await connectToDatabase();
@@ -154,6 +155,13 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     await connectToDatabase();
+
+    // Verifica e inicia o WhatsApp se necessário
+    if (!isWhatsAppConnected()) {
+      console.log("🔄 WhatsApp não está conectado. Iniciando...");
+      initWhatsApp(); // isso já cuida da inicialização e eventos
+    }
+
     const clientes = await ClienteModel.find();
     return NextResponse.json(clientes, { status: 200 });
   } catch (e: unknown) {

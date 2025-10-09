@@ -1,4 +1,55 @@
-2025/10/08-20:23:43.078 13fc Reusing MANIFEST C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2025/10/08-20:23:43.078 13fc Recovering log #498
-2025/10/08-20:23:43.089 13fc Reusing old log C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000498.log 
-2025/10/08-20:23:44.795 334 Manual compaction at level-0 from '\x00%\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00&\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/10/08-21:13:06.469 275c Reusing MANIFEST C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/10/08-21:13:06.469 275c Recovering log #558
+2025/10/08-21:13:06.643 275c Reusing old log C:\Users\Roberto\Desktop\SaasBarber\.wwebjs_auth\session-barbearia-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000558.log 
+2025/10/08-21:13:08.287 4a48 Level-0 table #568: started
+2025/10/08-21:13:08.312 4a48 Level-0 table #568: 803979 bytes OK
+2025/10/08-21:13:08.316 4a48 Delete type=0 #558
+2025/10/08-21:13:08.316 4a48 Manual compaction at level-0 from '\x00'\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00(\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/10/08-21:13:10.874 4d30 Compacting 1@1 + 10@2 files
+2025/10/08-21:13:10.970 4d30 Generated table #569@1: 56310 keys, 2224119 bytes
+2025/10/08-21:13:11.047 4d30 Generated table #570@1: 21375 keys, 2181356 bytes
+2025/10/08-21:13:11.096 4d30 Generated table #571@1: 3123 keys, 2157732 bytes
+2025/10/08-21:13:11.141 4d30 Generated table #572@1: 2846 keys, 2153969 bytes
+2025/10/08-21:13:11.222 4d30 Generated table #573@1: 25400 keys, 2234517 bytes
+2025/10/08-21:13:11.317 4d30 Generated table #574@1: 27077 keys, 2214775 bytes
+2025/10/08-21:13:11.402 4d30 Generated table #575@1: 52346 keys, 2187917 bytes
+2025/10/08-21:13:11.530 4d30 Generated table #576@1: 100452 keys, 2250759 bytes
+2025/10/08-21:13:11.569 4d30 Generated table #577@1: 31537 keys, 707665 bytes
+2025/10/08-21:13:11.569 4d30 Compacted 1@1 + 10@2 files => 18312809 bytes
+2025/10/08-21:13:11.572 4d30 compacted to: files[ 0 0 9 0 0 0 0 ]
+2025/10/08-21:13:11.572 4d30 Delete type=2 #529
+2025/10/08-21:13:11.572 4d30 Delete type=2 #530
+2025/10/08-21:13:11.572 4d30 Delete type=2 #531
+2025/10/08-21:13:11.572 4d30 Delete type=2 #549
+2025/10/08-21:13:11.572 4d30 Delete type=2 #560
+2025/10/08-21:13:11.572 4d30 Delete type=2 #561
+2025/10/08-21:13:11.572 4d30 Delete type=2 #562
+2025/10/08-21:13:11.572 4d30 Delete type=2 #563
+2025/10/08-21:13:11.572 4d30 Delete type=2 #564
+2025/10/08-21:13:11.572 4d30 Delete type=2 #565
+2025/10/08-21:13:11.572 4d30 Delete type=2 #568
+2025/10/08-21:31:21.012 4b2c Level-0 table #579: started
+2025/10/08-21:31:21.037 4b2c Level-0 table #579: 747571 bytes OK
+2025/10/08-21:31:21.040 4b2c Delete type=0 #567
+2025/10/08-21:35:56.997 3fb8 Compacting 1@1 + 9@2 files
+2025/10/08-21:35:57.099 3fb8 Generated table #580@1: 56972 keys, 2223934 bytes
+2025/10/08-21:35:57.180 3fb8 Generated table #581@1: 21712 keys, 2180998 bytes
+2025/10/08-21:35:57.216 3fb8 Generated table #582@1: 3114 keys, 2157282 bytes
+2025/10/08-21:35:57.248 3fb8 Generated table #583@1: 2847 keys, 2155214 bytes
+2025/10/08-21:35:57.331 3fb8 Generated table #584@1: 25049 keys, 2233365 bytes
+2025/10/08-21:35:57.424 3fb8 Generated table #585@1: 27401 keys, 2217664 bytes
+2025/10/08-21:35:57.504 3fb8 Generated table #586@1: 51326 keys, 2188396 bytes
+2025/10/08-21:35:57.632 3fb8 Generated table #587@1: 100522 keys, 2251230 bytes
+2025/10/08-21:35:57.676 3fb8 Generated table #588@1: 32550 keys, 731039 bytes
+2025/10/08-21:35:57.676 3fb8 Compacted 1@1 + 9@2 files => 18339122 bytes
+2025/10/08-21:35:57.679 3fb8 compacted to: files[ 0 0 9 0 0 0 0 ]
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #569
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #570
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #571
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #572
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #573
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #574
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #575
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #576
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #577
+2025/10/08-21:35:57.679 3fb8 Delete type=2 #579

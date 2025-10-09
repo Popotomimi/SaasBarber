@@ -8,13 +8,14 @@ function normalizePhone(phone: string): string {
 }
 
 export async function GET(
-  _: Request,
-  { params }: { params: { phone: string } }
+  request: Request,
+  context: { params: { phone: string } }
 ) {
   await connectToDatabase();
 
   try {
-    const rawPhone = params.phone;
+    // Aguarde explicitamente o acesso ao params
+    const rawPhone = (await Promise.resolve(context.params)).phone;
     const normalized = normalizePhone(rawPhone);
 
     const histories = await HistoryModel.find();

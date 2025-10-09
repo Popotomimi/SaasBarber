@@ -71,7 +71,8 @@ const BloqueioCard = () => {
     );
   };
 
-  if (loading) return <p className="p-6">Carregando bloqueios...</p>;
+  if (loading)
+    return <p className="p-6 text-center">Carregando bloqueios...</p>;
   if (bloqueios.length === 0)
     return <p className="p-6 text-center">Nenhum bloqueio encontrado.</p>;
 
