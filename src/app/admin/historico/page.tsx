@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
 import History from "@/interfaces/History";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import BackAdmin from "@/components/back/back";
 
 export default function HistoricoPage() {
   const [historicos, setHistoricos] = useState<History[]>([]);
@@ -50,6 +53,7 @@ export default function HistoricoPage() {
 
   return (
     <div className="min-h-screen p-6">
+      <BackAdmin />
       <h1 className="text-2xl font-bold mb-4 text-white">
         Histórico de Clientes
       </h1>

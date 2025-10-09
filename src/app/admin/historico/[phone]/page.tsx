@@ -12,6 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
+type Atendimento = {
+  date: string; // já formatada como string
+  time?: string;
+  barber: string;
+  service: string;
+};
+
 export default function HistoricoClientePage() {
   const params = useParams();
   const router = useRouter();
@@ -35,6 +42,26 @@ export default function HistoricoClientePage() {
       .finally(() => setLoading(false));
   }, [phone]);
 
+  const expandHistoricos = (historicos: History[]): Atendimento[] => {
+    const atendimentos: Atendimento[] = [];
+
+    historicos.forEach((h) => {
+      for (let i = 0; i < h.dates.length; i++) {
+        const rawDate = h.dates[i];
+        const formattedDate = new Date(rawDate).toLocaleDateString("pt-BR");
+
+        atendimentos.push({
+          date: formattedDate,
+          time: h.times?.[i],
+          barber: h.barbers[i],
+          service: h.services[i],
+        });
+      }
+    });
+
+    return atendimentos;
+  };
+
   if (loading)
     return (
       <div className="p-6 text-white min-h-screen">Carregando histórico...</div>
@@ -47,6 +74,8 @@ export default function HistoricoClientePage() {
       </div>
     );
   }
+
+  const atendimentos = expandHistoricos(historicos);
 
   return (
     <div className="min-h-screen flex flex-col p-6">
@@ -63,30 +92,26 @@ export default function HistoricoClientePage() {
         </Button>
       </div>
 
+      <p className="text-white mb-4">
+        Total de atendimentos: {atendimentos.length}
+      </p>
+
       <div className="rounded-lg overflow-auto border border-zinc-700">
         <Accordion type="multiple" className="w-full">
-          {historicos.map((h, index) => (
-            <AccordionItem key={h._id} value={`item-${index}`}>
+          {atendimentos.map((a, index) => (
+            <AccordionItem key={index} value={`item-${index}`}>
               <AccordionTrigger className="text-white bg-zinc-800 px-4 py-2 rounded">
-                Atendimento em {new Date(h.dates[0]).toLocaleDateString()} com{" "}
-                {h.barbers.join(", ")}
+                Atendimento em {a.date} com {a.barber}
               </AccordionTrigger>
               <AccordionContent className="bg-zinc-900 text-white px-4 py-2">
                 <p>
-                  <strong>Serviços:</strong> {h.services.join(", ")}
+                  <strong>Serviço:</strong> {a.service}
                 </p>
-                <p>
-                  <strong>Barbeiros:</strong> {h.barbers.join(", ")}
-                </p>
-                <p>
-                  <strong>Datas:</strong>{" "}
-                  {h.dates
-                    .map((d) => new Date(d).toLocaleDateString())
-                    .join(", ")}
-                </p>
-                <p>
-                  <strong>Total de atendimentos:</strong> {h.amount}
-                </p>
+                {a.time && (
+                  <p>
+                    <strong>Horário:</strong> {a.time}
+                  </p>
+                )}
               </AccordionContent>
             </AccordionItem>
           ))}

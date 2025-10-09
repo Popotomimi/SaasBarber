@@ -15,7 +15,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1a1a1a] text-white py-10 px-6">
+    <footer className="bg-[#1a1a1a] text-white py-10 px-6 mt-10">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between md:items-start divide-y md:divide-y-0 md:divide-x divide-gray-700">
         {/* Logo e nome */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 px-4 py-6 md:py-0">

@@ -6,6 +6,7 @@ interface History {
   barbers: string[];
   dates: Date[];
   amount: number;
+  times?: string[];
 }
 
 export default History;

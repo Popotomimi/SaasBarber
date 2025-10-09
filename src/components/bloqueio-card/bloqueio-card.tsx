@@ -77,17 +77,17 @@ const BloqueioCard = () => {
     return <p className="p-6 text-center">Nenhum bloqueio encontrado.</p>;
 
   return (
-    <div className="p-6 flex flex-col md:flex-row md:flex-wrap justify-center items-start gap-4">
+    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
       {bloqueios.map((bloqueio) => (
         <Card
           key={bloqueio._id}
-          className="shadow-sm bg-zinc-900 text-white max-w-xl">
-          <CardHeader>
-            <h3 className="text-lg font-semibold">
+          className="shadow-sm bg-zinc-900 text-white w-full max-w-sm flex flex-col items-center text-center">
+          <CardHeader className="w-full flex justify-center">
+            <h3 className="text-lg font-semibold text-center">
               Bloqueio de {bloqueio.barber}
             </h3>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             <p>
               <strong>Motivo:</strong> {bloqueio.motivo}
             </p>
@@ -99,7 +99,7 @@ const BloqueioCard = () => {
               <strong>Fim:</strong> {bloqueio.endDate} às {bloqueio.endTime}
             </p>
           </CardContent>
-          <CardFooter className="flex justify-end">
+          <CardFooter className="w-full flex justify-center">
             <Button
               variant="destructive"
               onClick={() => handleDelete(bloqueio._id)}

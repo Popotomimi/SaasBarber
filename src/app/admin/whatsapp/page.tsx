@@ -1,9 +1,9 @@
 "use client";
 
+import BackAdmin from "@/components/back/back";
 import QRPage from "@/components/qrcode/qrcode";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LogOut } from "lucide-react";
-import Link from "next/link";
+import { LogOut } from "lucide-react";
 
 const WhatsPage = () => {
   const handleDisconnect = async () => {
@@ -20,19 +20,14 @@ const WhatsPage = () => {
     <div className="relative min-h-screen px-6 pt-6">
       {/* Top bar com botões */}
       <div className=" gap-7 top-4 mt-5 left-0 right-0 flex justify-between items-center px-6 z-10">
-        <Button asChild>
-          <Link href="/admin" className="flex items-center gap-2">
-            <ArrowLeft size={18} />
-            Voltar
-          </Link>
-        </Button>
+        <BackAdmin />
 
-        <button
+        <Button
           onClick={handleDisconnect}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+          className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
           <LogOut size={18} />
           Desconectar WhatsApp
-        </button>
+        </Button>
       </div>
 
       {/* Conteúdo principal */}

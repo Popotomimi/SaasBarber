@@ -46,6 +46,11 @@ export default function AdminPage() {
             <Link href="/admin/historico">Hitorico de Clientes</Link>
           </Button>
           <Button
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+            asChild>
+            <Link href="/admin/stock">Estoque</Link>
+          </Button>
+          <Button
             onClick={handleLogout}
             className="bg-red-600 cursor-pointer hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-200">
             Sair do painel
