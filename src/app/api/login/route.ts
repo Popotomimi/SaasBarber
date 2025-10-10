@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
 
 export async function POST(req: Request) {
   const { username, password } = await req.json();
@@ -8,16 +8,19 @@ export async function POST(req: Request) {
     username === process.env.ADMIN_USER &&
     password === process.env.ADMIN_PASS
   ) {
-    const token = jwt.sign({ user: "barbeiro" }, process.env.JWT_SECRET!, {
-      expiresIn: "7d",
-    });
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+
+    const token = await new SignJWT({ user: "barbeiro" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(secret);
 
     const response = NextResponse.json({ success: true });
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 604800,
+      maxAge: 60 * 60 * 24 * 7, // 7 dias
     });
 
     return response;

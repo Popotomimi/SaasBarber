@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
       await jwtVerify(token, secret);
       return NextResponse.next();
     } catch (err) {
+      console.error("Erro na verificação do token:", err);
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
