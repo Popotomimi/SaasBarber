@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Enviar mensagem para o cliente
-    const mensagem = `Novo agendamento realizado:\n
+    /*const mensagem = `Novo agendamento realizado:\n
       Nome: ${name}\n
       Data: ${date}\n
       Horário: ${time}\n
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
       Barbeiro: ${barber}\n
       Telefone do cliente: ${phone}`;
 
-    await sendWhatsAppMessage(mensagem, "5511959533499");
+    await sendWhatsAppMessage(mensagem, "5511959533499");*/
 
     // 📊 Atualizar histórico
     const historyExistente = await HistoryModel.findOne({ phone });
