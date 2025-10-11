@@ -22,12 +22,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const dataAtual = DateTime.now().setZone("America/Sao_Paulo");
+    const dataAtual = DateTime.now()
+      .setZone("America/Sao_Paulo")
+      .startOf("minute");
     const dataAgendada = DateTime.fromISO(`${date}T${time}`, {
       zone: "America/Sao_Paulo",
     });
 
-    if (!dataAgendada.isValid || dataAgendada <= dataAtual) {
+    if (!dataAgendada.isValid || dataAgendada < dataAtual) {
       return NextResponse.json(
         { message: "A data e o horário devem ser no futuro!" },
         { status: 422 }
