@@ -5,8 +5,6 @@ import { HistoryModel } from "@/models/History";
 import { Bloqueio } from "@/models/Bloqueio";
 import { DateTime } from "luxon";
 import { services } from "@/db/services";
-import { sendWhatsAppMessage } from "@/lib/sendWhatsAppMessage";
-import { initWhatsAppSafe, isWhatsAppConnected } from "@/lib/whatsapp";
 
 export async function POST(req: NextRequest) {
   await connectToDatabase();
@@ -33,6 +31,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { message: "A data e o horário devem ser no futuro!" },
         { status: 422 }
+      );
+    }
+
+    console.log("Dia da semana agendado:", dataAgendada.weekday);
+
+    // 🚫 Bloquear todas as segundas-feiras
+    if (dataAgendada.weekday === 1) {
+      return NextResponse.json(
+        {
+          message:
+            "Horário indisponível! Não é possível agendar às segundas-feiras.",
+        },
+        { status: 403 }
       );
     }
 

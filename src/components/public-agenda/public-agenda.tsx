@@ -1,120 +1,150 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Calendar from "react-calendar";
 import Cliente from "../../interfaces/Cliente";
+import Bloqueio from "../../interfaces/Bloqueio";
 import { LuMessageCircleWarning } from "react-icons/lu";
 import extractDuration from "../utils/agenda/extractDuration";
 import calculateEndTime from "../utils/agenda/calculateEndTime";
-import calculateSchedule from "../utils/agenda/calculateSchedule";
 import { fetchClientes } from "../utils/form/fetchClientes";
-import "react-calendar/dist/Calendar.css";
 
-const PublicAgenda = () => {
+interface Service {
+  name: string;
+  duration: number;
+}
+
+interface PublicAgendaSelectorProps {
+  selectedService: Service | undefined;
+  selectedBarber: string;
+  selectedDate: string;
+  onTimeSelect: (time: string) => void;
+}
+
+const PublicAgendaSelector: React.FC<PublicAgendaSelectorProps> = ({
+  selectedService,
+  selectedBarber,
+  selectedDate,
+  onTimeSelect,
+}) => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const startTime = "09:00";
   const endTime = "21:00";
-  const selectedBarber = "Artista do Corte";
-
-  // ✅ Corrigido: evita UTC e gera "YYYY-MM-DD" localmente
-  const selectedDateStr =
-    selectedDate.getFullYear() +
-    "-" +
-    String(selectedDate.getMonth() + 1).padStart(2, "0") +
-    "-" +
-    String(selectedDate.getDate()).padStart(2, "0");
 
   useEffect(() => {
     fetchClientes().then(setClientes);
+    fetch("/api/bloqueio")
+      .then((res) => res.json())
+      .then(setBloqueios)
+      .catch(() => setBloqueios([]));
 
-    const handleUpdate = () => {
-      fetchClientes().then(setClientes);
-    };
-
+    const handleUpdate = () => fetchClientes().then(setClientes);
     window.addEventListener("agendaAtualizada", handleUpdate);
-
-    return () => {
-      window.removeEventListener("agendaAtualizada", handleUpdate);
-    };
+    return () => window.removeEventListener("agendaAtualizada", handleUpdate);
   }, []);
 
-  const filteredClientes = clientes.filter((cliente) => {
+  useEffect(() => {
+    setSelectedTime(null);
+  }, [selectedService, selectedBarber, selectedDate]);
+
+  if (!selectedService || !selectedDate || !selectedBarber) {
     return (
-      cliente.barber === selectedBarber && cliente.date === selectedDateStr
+      <p className="text-white text-center mt-4">
+        Selecione serviço, barbeiro e data para ver os horários disponíveis.
+      </p>
+    );
+  }
+
+  const bloqueioDoDia = bloqueios.find((bloqueio) => {
+    const bloqueioInicio = new Date(bloqueio.startDate);
+    const bloqueioFim = new Date(bloqueio.endDate);
+    const dataSelecionada = new Date(selectedDate);
+    return (
+      bloqueio.barber === selectedBarber &&
+      dataSelecionada >= bloqueioInicio &&
+      dataSelecionada <= bloqueioFim
     );
   });
 
-  return (
-    <section className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4 text-center text-white">Agenda</h2>
-
-      <div className="mb-6 flex justify-center">
-        <Calendar
-          locale="pt-BR"
-          onChange={(value) => {
-            if (value instanceof Date) {
-              setSelectedDate(value);
-            }
-          }}
-          value={selectedDate}
-          minDate={new Date()}
-          className="react-calendar w-full max-w-md bg-[#1a1a1a] text-white rounded-lg p-4 shadow-md [&_.react-calendar__tile]:rounded-md [&_.react-calendar__tile]:p-2 [&_.react-calendar__tile]:text-sm [&_.react-calendar__tile]:text-gray-300 [&_.react-calendar__tile--active]:bg-blue-400 [&_.react-calendar__tile--active]:text-white [&_.react-calendar__tile:hover]:bg-[#333] [&_.react-calendar__navigation]:mb-4 [&_.react-calendar__navigation__label]:text-white [&_.react-calendar__navigation__arrow]:text-white [&_.react-calendar__month-view__weekdays]:text-gray-400 [&_.react-calendar__month-view__weekdays]:uppercase [&_.react-calendar__month-view__weekdays]:text-xs"
-          tileClassName={({ date }) => {
-            const dateStr =
-              date.getFullYear() +
-              "-" +
-              String(date.getMonth() + 1).padStart(2, "0") +
-              "-" +
-              String(date.getDate()).padStart(2, "0");
-            return dateStr === selectedDateStr
-              ? "bg-blue-500 text-white rounded-md"
-              : "hover:bg-blue-100 rounded-md";
-          }}
-        />
+  if (bloqueioDoDia) {
+    return (
+      <div className="mt-6 text-center text-white">
+        <h3 className="text-xl font-semibold mb-2">Agenda bloqueada</h3>
+        <p className="text-sm text-gray-300 mb-2">
+          Motivo: <strong>{bloqueioDoDia.motivo}</strong>
+        </p>
+        <LuMessageCircleWarning className="mx-auto text-6xl text-blue-400" />
       </div>
+    );
+  }
 
-      <p className="text-center text-sm mb-2 text-white">
-        <strong>Horário de funcionamento:</strong> {startTime} às {endTime}
-      </p>
+  const filteredClientes = clientes.filter(
+    (cliente) =>
+      cliente.barber === selectedBarber && cliente.date === selectedDate
+  );
 
-      {filteredClientes.length === 0 ? (
+  const generateAvailableSlots = () => {
+    const occupiedSlots = filteredClientes.map((cliente) => ({
+      start: cliente.time,
+      end: calculateEndTime(cliente.time, extractDuration(cliente.service)),
+    }));
+
+    const slots: string[] = [];
+    let current = startTime;
+
+    while (calculateEndTime(current, selectedService.duration) <= endTime) {
+      const end = calculateEndTime(current, selectedService.duration);
+      const isOccupied = occupiedSlots.some(
+        (slot) => !(end <= slot.start || current >= slot.end)
+      );
+      if (!isOccupied) slots.push(current);
+      current = calculateEndTime(current, selectedService.duration);
+    }
+
+    return slots;
+  };
+
+  const availableSlots = generateAvailableSlots();
+
+  const handleSelect = (time: string) => {
+    setSelectedTime(time);
+    onTimeSelect(time);
+  };
+
+  return (
+    <div className="mt-6">
+      <h3 className="text-white text-center mb-2 font-semibold">
+        Horários disponíveis
+      </h3>
+      {availableSlots.length === 0 ? (
         <div className="text-center text-gray-500">
-          <p className="mb-2">Nenhum horário ocupado</p>
-          <LuMessageCircleWarning className="mx-auto text-9xl text-blue-400" />
+          <p className="mb-2">Nenhum horário disponível</p>
+          <LuMessageCircleWarning className="mx-auto text-6xl text-blue-400" />
         </div>
       ) : (
-        <div className="space-y-2 mb-7">
-          {calculateSchedule(filteredClientes, startTime, endTime).map(
-            (slot, index) => (
-              <div
-                key={index}
-                className={`p-3 rounded-md border ${
-                  slot.type === "occupied"
-                    ? "bg-red-100 border-red-300"
-                    : "bg-green-100 border-green-300"
-                }`}>
-                <p className="text-sm font-medium">
-                  {slot.start} - {slot.end} |{" "}
-                  {slot.type === "occupied"
-                    ? `Ocupado (Barbeiro: ${
-                        filteredClientes.find(
-                          (cliente) =>
-                            cliente.time === slot.start &&
-                            calculateEndTime(
-                              cliente.time,
-                              extractDuration(cliente.service)
-                            ) === slot.end
-                        )?.barber || "Desconhecido"
-                      })`
-                    : "Disponível"}
-                </p>
-              </div>
-            )
-          )}
+        <div className="grid grid-cols-3 gap-3">
+          {availableSlots.map((time) => (
+            <button
+              type="button"
+              key={time}
+              onClick={() => handleSelect(time)}
+              className={`py-2 px-4 rounded font-medium transition ${
+                selectedTime === time
+                  ? "bg-gray-500 text-white"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}>
+              {time}
+            </button>
+          ))}
         </div>
       )}
-    </section>
+      {selectedTime && (
+        <p className="text-center text-sm text-white mt-4">
+          Horário selecionado: <strong>{selectedTime}</strong>
+        </p>
+      )}
+    </div>
   );
 };
 
-export default PublicAgenda;
+export default PublicAgendaSelector;

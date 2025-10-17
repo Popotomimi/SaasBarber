@@ -7,9 +7,9 @@ export default function QRPage() {
   const [qr, setQr] = useState("");
   const [connected, setConnected] = useState(false);
 
-  useEffect(() => {
-    const fetchQR = async () => {
-      const res = await fetch("/api/qr");
+  const fetchQR = async () => {
+    try {
+      const res = await fetch("https://saasbarberbackend.onrender.com/qr");
       const data = await res.json();
 
       if (data.connected) {
@@ -18,8 +18,12 @@ export default function QRPage() {
       }
 
       if (data.qr) setQr(data.qr);
-    };
+    } catch (err) {
+      console.error("Erro ao buscar QR Code:", err);
+    }
+  };
 
+  useEffect(() => {
     fetchQR();
     const intervalId = setInterval(fetchQR, 3000);
     return () => clearInterval(intervalId);

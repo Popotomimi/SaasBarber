@@ -31,10 +31,16 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import Cliente from "@/interfaces/Cliente";
+import PublicAgendaSelector from "../public-agenda/public-agenda";
 
 const FormSchedule = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [selectedService, setSelectedService] = useState<
+    { name: string; duration: number } | undefined
+  >();
+  const [selectedBarber, setSelectedBarber] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<string>("");
 
   const form = useForm<z.infer<typeof scheduleSchema>>({
     resolver: zodResolver(scheduleSchema),
@@ -176,24 +182,10 @@ const FormSchedule = () => {
                   <Input
                     type="date"
                     {...field}
-                    className="bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="hora"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm text-gray-300">Hora</FormLabel>
-                <FormControl>
-                  <Input
-                    type="time"
-                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setSelectedDate(e.target.value);
+                    }}
                     className="bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition"
                   />
                 </FormControl>
@@ -209,8 +201,11 @@ const FormSchedule = () => {
               <FormItem>
                 <FormLabel className="text-sm text-gray-300">Serviço</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
+                  onValueChange={(value) => {
+                    form.setValue("service", value);
+                    const found = services.find((s) => s.name === value);
+                    setSelectedService(found);
+                  }}
                   defaultValue="">
                   <FormControl>
                     <SelectTrigger className="w-full bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition">
@@ -242,8 +237,10 @@ const FormSchedule = () => {
                   Barbeiro
                 </FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
+                  onValueChange={(value) => {
+                    form.setValue("barber", value);
+                    setSelectedBarber(value);
+                  }}
                   defaultValue="">
                   <FormControl>
                     <SelectTrigger className="w-full bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition">
@@ -264,6 +261,13 @@ const FormSchedule = () => {
                 <FormMessage />
               </FormItem>
             )}
+          />
+
+          <PublicAgendaSelector
+            selectedService={selectedService}
+            selectedBarber={selectedBarber}
+            selectedDate={selectedDate}
+            onTimeSelect={(time) => form.setValue("hora", time)}
           />
 
           <FormField
