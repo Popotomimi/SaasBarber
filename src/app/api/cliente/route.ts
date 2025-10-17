@@ -34,8 +34,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("Dia da semana agendado:", dataAgendada.weekday);
-
     // 🚫 Bloquear todas as segundas-feiras
     if (dataAgendada.weekday === 1) {
       return NextResponse.json(
