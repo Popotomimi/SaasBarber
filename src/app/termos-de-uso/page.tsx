@@ -1,9 +1,19 @@
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+
 export default function TermosDeUso() {
   return (
-    <main className="max-w-4xl mx-auto px-6 py-12 text-zinc-800">
+    <main className="max-w-4xl mx-auto px-6 py-12 text-white">
+      <Button asChild>
+        <Link href="/" className="mb-6 inline-flex items-center gap-2">
+          <ArrowLeft size={16} /> Voltar
+        </Link>
+      </Button>
+
       <h1 className="text-3xl font-bold mb-6">Termos de Uso</h1>
 
-      <section className="space-y-4 text-gray-700">
+      <section className="space-y-4 text-white">
         <p>
           Ao utilizar o site Artista do Corte, você concorda com os seguintes
           termos e condições. Estes termos visam garantir uma experiência segura
