@@ -18,7 +18,7 @@ const parseDateLocal = (dateStr: string) => {
 const AdminAgenda = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const selectedBarber = "Artista do Corte";
+  const [selectedBarber, setSelectedBarber] = useState<string>(barbers[0].name);
   const [clienteEditando, setClienteEditando] = useState<Cliente | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -126,6 +126,20 @@ const AdminAgenda = () => {
     <section id="agendas" className="max-w-3xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-center text-white">Agenda</h2>
 
+      <div className="flex justify-center gap-4 mb-6">
+        {barbers.map((barber) => (
+          <button
+            key={barber.name}
+            onClick={() => setSelectedBarber(barber.name)}
+            className={`px-4 py-2 rounded font-semibold transition ${
+              selectedBarber === barber.name
+                ? "bg-blue-500 cursor-pointer text-white hover:bg-blue-600"
+                : "bg-gray-300 cursor-pointer text-black hover:bg-gray-400"
+            }`}>
+            {barber.name}
+          </button>
+        ))}
+      </div>
       <div className="mb-6 flex justify-center">
         <Calendar
           locale="pt-BR"

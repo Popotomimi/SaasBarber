@@ -41,6 +41,7 @@ const FormSchedule = () => {
   >();
   const [selectedBarber, setSelectedBarber] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
+  const [showAgenda, setShowAgenda] = useState(true);
 
   const form = useForm<z.infer<typeof scheduleSchema>>({
     resolver: zodResolver(scheduleSchema),
@@ -62,6 +63,13 @@ const FormSchedule = () => {
     if (savedName) form.setValue("name", savedName);
     if (savedPhone) form.setValue("phoneNumber", savedPhone);
   }, [form]);
+
+  // Gerencia a exibição do seletor de horários
+  useEffect(() => {
+    if (selectedService && selectedBarber && selectedDate) {
+      setShowAgenda(true);
+    }
+  }, [selectedService, selectedBarber, selectedDate]);
 
   // Enviar agendamento
   async function onSubmit(values: z.infer<typeof scheduleSchema>) {
@@ -135,6 +143,7 @@ const FormSchedule = () => {
       });
       form.setValue("service", "");
       form.setValue("barber", "");
+      setShowAgenda(false);
       window.dispatchEvent(new Event("agendaAtualizada"));
       fetchClientes().then(setClientes);
     } catch (error) {
@@ -201,12 +210,12 @@ const FormSchedule = () => {
               <FormItem>
                 <FormLabel className="text-sm text-gray-300">Serviço</FormLabel>
                 <Select
+                  value={field.value}
                   onValueChange={(value) => {
-                    form.setValue("service", value);
+                    field.onChange(value);
                     const found = services.find((s) => s.name === value);
                     setSelectedService(found);
-                  }}
-                  defaultValue="">
+                  }}>
                   <FormControl>
                     <SelectTrigger className="w-full bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition">
                       <SelectValue placeholder="Escolha o serviço" />
@@ -237,11 +246,11 @@ const FormSchedule = () => {
                   Barbeiro
                 </FormLabel>
                 <Select
+                  value={field.value}
                   onValueChange={(value) => {
-                    form.setValue("barber", value);
+                    field.onChange(value);
                     setSelectedBarber(value);
-                  }}
-                  defaultValue="">
+                  }}>
                   <FormControl>
                     <SelectTrigger className="w-full bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition">
                       <SelectValue placeholder="Escolha o barbeiro" />
@@ -263,12 +272,14 @@ const FormSchedule = () => {
             )}
           />
 
-          <PublicAgendaSelector
-            selectedService={selectedService}
-            selectedBarber={selectedBarber}
-            selectedDate={selectedDate}
-            onTimeSelect={(time) => form.setValue("hora", time)}
-          />
+          {showAgenda && (
+            <PublicAgendaSelector
+              selectedService={selectedService}
+              selectedBarber={selectedBarber}
+              selectedDate={selectedDate}
+              onTimeSelect={(time) => form.setValue("hora", time)}
+            />
+          )}
 
           <FormField
             control={form.control}

@@ -119,16 +119,23 @@ export async function POST(req: NextRequest) {
       phone,
     });
 
-    // Enviar mensagem para o cliente
+    // Enviar mensagem para o barbeiro
     /*const mensagem = `Novo agendamento realizado:\n
-      Nome: ${name}\n
-      Data: ${date}\n
-      Horário: ${time}\n
-      Serviço: ${service}\n
-      Barbeiro: ${barber}\n
-      Telefone do cliente: ${phone}`;
+    Nome: ${name}\n
+    Data: ${date}\n
+    Horário: ${time}\n
+    Serviço: ${service}\n
+    Barbeiro: ${barber}\n
+    Telefone do cliente: ${phone}`;
 
-    await sendWhatsAppMessage(mensagem, "5511959533499");*/
+    await fetch("https://saasbarberbackend.onrender.com/send-message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: mensagem,
+        number: "5511959533499",
+      }),
+    });*/
 
     // 📊 Atualizar histórico
     const historyExistente = await HistoryModel.findOne({ phone });

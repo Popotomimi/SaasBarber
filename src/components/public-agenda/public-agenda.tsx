@@ -130,8 +130,8 @@ const PublicAgendaSelector: React.FC<PublicAgendaSelectorProps> = ({
               onClick={() => handleSelect(time)}
               className={`py-2 px-4 rounded font-medium transition ${
                 selectedTime === time
-                  ? "bg-gray-500 text-white"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
+                  ? "bg-gray-500 cursor-pointer text-white"
+                  : "bg-blue-500 cursor-pointer text-white hover:bg-blue-600"
               }`}>
               {time}
             </button>
