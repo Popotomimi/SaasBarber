@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 🚫 Bloquear todas as segundas-feiras
-    if (dataAgendada.weekday === 1) {
+    /*if (dataAgendada.weekday === 1) {
       return NextResponse.json(
         {
           message:
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         },
         { status: 403 }
       );
-    }
+    }*/
 
     // 🔒 Verificar bloqueios
     const bloqueios = await Bloqueio.find({ barber });
