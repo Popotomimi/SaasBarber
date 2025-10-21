@@ -78,16 +78,21 @@ const PublicAgendaSelector: React.FC<PublicAgendaSelectorProps> = ({
     );
   }
 
+  const normalizedDate = new Date(selectedDate).toISOString().split("T")[0];
+
   const filteredClientes = clientes.filter(
     (cliente) =>
-      cliente.barber === selectedBarber && cliente.date === selectedDate
+      cliente.barber === selectedBarber && cliente.date === normalizedDate
   );
 
   const generateAvailableSlots = () => {
-    const occupiedSlots = filteredClientes.map((cliente) => ({
-      start: cliente.time,
-      end: calculateEndTime(cliente.time, extractDuration(cliente.service)),
-    }));
+    const occupiedSlots = filteredClientes.map((cliente) => {
+      const start = cliente.time;
+      const duration =
+        extractDuration(cliente.service) || selectedService.duration;
+      const end = calculateEndTime(start, duration);
+      return { start, end };
+    });
 
     const slots: string[] = [];
     let current = startTime;
