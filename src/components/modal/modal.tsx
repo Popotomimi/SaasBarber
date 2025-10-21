@@ -22,6 +22,7 @@ interface Props {
     duration: number;
     phone: string;
     barber: string;
+    price: number;
   };
   setFormData: React.Dispatch<React.SetStateAction<Props["formData"]>>;
   onClose: () => void;
@@ -59,10 +60,18 @@ const Modal: React.FC<Props> = ({
             value={formData.service}
             onChange={(e) => {
               const selected = services.find((s) => s.name === e.target.value);
+              const priceMatch = selected?.name.match(
+                /R\$\s?(\d+[\.,]?\d{0,2})/
+              );
+              const extractedPrice = priceMatch
+                ? parseFloat(priceMatch[1].replace(",", "."))
+                : 0;
+
               setFormData({
                 ...formData,
                 service: selected?.name || "",
                 duration: selected?.duration || 0,
+                price: extractedPrice,
               });
             }}
             className="w-full px-3 py-2 bg-[#2a2a2a] text-white rounded">
@@ -99,10 +108,15 @@ const Modal: React.FC<Props> = ({
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="secondary" onClick={onClose}>
+          <Button
+            className="cursor-pointer"
+            variant="secondary"
+            onClick={onClose}>
             Cancelar
           </Button>
-          <Button className="bg-blue-400 hover:bg-blue-600" onClick={onSave}>
+          <Button
+            className="bg-blue-400 cursor-pointer hover:bg-blue-600"
+            onClick={onSave}>
             Salvar
           </Button>
         </DialogFooter>

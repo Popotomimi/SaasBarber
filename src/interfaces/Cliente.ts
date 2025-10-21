@@ -7,6 +7,7 @@ interface Cliente {
   duration: number;
   barber: string;
   phone: string;
+  price: number;
 }
 
 export default Cliente;

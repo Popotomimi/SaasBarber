@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
   await connectToDatabase();
 
   const body = await req.json();
-  const { name, date, time, service, barber, phone } = body;
+  const { name, date, time, service, barber, phone, price } = body;
 
-  if (!name || !date || !time || !service || !barber || !phone) {
+  if (!name || !date || !time || !service || !barber || !phone || !price) {
     return NextResponse.json(
       { message: "Todos os campos são obrigatórios!" },
       { status: 422 }
@@ -146,6 +146,7 @@ export async function POST(req: NextRequest) {
       historyExistente.services.push(service);
       historyExistente.barbers.push(barber);
       historyExistente.times.push(time);
+      historyExistente.prices.push(price);
       await historyExistente.save();
     } else {
       await HistoryModel.create({
@@ -156,6 +157,7 @@ export async function POST(req: NextRequest) {
         times: [time],
         services: [service],
         barbers: [barber],
+        prices: [price],
       });
     }
 

@@ -7,6 +7,7 @@ interface History {
   dates: Date[];
   amount: number;
   times?: string[];
+  prices: number[];
 }
 
 export default History;

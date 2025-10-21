@@ -77,7 +77,11 @@ const AdminFormSchedule = () => {
     }
 
     const selectedService = services.find((srv) => srv.name === service);
-    if (!selectedService || !selectedService.duration) {
+    if (
+      !selectedService ||
+      !selectedService.duration ||
+      !selectedService.price
+    ) {
       toast.warning("Serviço inválido.");
       return;
     }
@@ -88,6 +92,7 @@ const AdminFormSchedule = () => {
       time,
       service: selectedService.name,
       duration: selectedService.duration,
+      price: selectedService.price,
       barber: selectedBarber,
       phone,
     };

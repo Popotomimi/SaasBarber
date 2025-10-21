@@ -27,6 +27,7 @@ const AdminAgenda = () => {
     duration: 0,
     phone: "",
     barber: "",
+    price: 0,
   });
 
   const handleEdit = (cliente: Cliente) => {
@@ -38,6 +39,7 @@ const AdminAgenda = () => {
       duration: cliente.duration,
       phone: cliente.phone,
       barber: cliente.barber,
+      price: cliente.price || 0,
     });
   };
 
@@ -54,12 +56,14 @@ const AdminAgenda = () => {
       toast.success("Agendamento atualizado com sucesso!");
       setClienteEditando(null);
       fetchClientes().then(setClientes);
+
+      window.dispatchEvent(new Event("agendaAtualizada"));
     } catch (error) {
       toast.error("Erro ao atualizar agendamento.");
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (cliente: Cliente) => {
     toast.info(
       <div>
         <p className="mb-2">Tem certeza que deseja excluir este agendamento?</p>
@@ -67,23 +71,41 @@ const AdminAgenda = () => {
           <button
             onClick={async () => {
               try {
-                await fetch(`/api/cliente/${id}`, {
-                  method: "DELETE",
+                await fetch(`/api/cliente/${cliente._id}`, {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    date: parseDateLocal(cliente.date).toISOString(),
+                  }),
                 });
-                setClientes((prev) => prev.filter((c) => c._id !== id));
+
+                setClientes((prev) =>
+                  prev.filter(
+                    (c) =>
+                      !(
+                        c.phone === cliente.phone &&
+                        c.date === cliente.date &&
+                        c.time === cliente.time
+                      )
+                  )
+                );
+
                 toast.dismiss();
                 toast.success("Agendamento excluído com sucesso!");
+                window.dispatchEvent(new Event("agendaAtualizada"));
               } catch (error) {
                 toast.dismiss();
                 toast.error("Erro ao excluir agendamento.");
               }
             }}
-            className="px-2 py-1 bg-red-500 text-white rounded text-sm">
+            className="px-2 py-1 bg-red-500 text-white cursor-pointer rounded text-sm">
             Confirmar
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-2 py-1 bg-gray-300 text-black rounded text-sm">
+            className="px-2 py-1 bg-gray-300 text-black cursor-pointer rounded text-sm">
             Cancelar
           </button>
         </div>
@@ -211,7 +233,7 @@ const AdminAgenda = () => {
                       Editar
                     </button>
                     <button
-                      onClick={() => handleDelete(cliente._id)}
+                      onClick={() => handleDelete(cliente)}
                       className="px-2 py-1 cursor-pointer bg-red-500 hover:bg-red-600 text-white rounded text-sm">
                       Excluir
                     </button>

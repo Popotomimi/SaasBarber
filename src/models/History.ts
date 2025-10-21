@@ -8,6 +8,7 @@ const historySchema = new Schema({
   times: [String],
   services: [String],
   barbers: [String],
+  prices: [Number],
 });
 
 export const HistoryModel = models.History || model("History", historySchema);

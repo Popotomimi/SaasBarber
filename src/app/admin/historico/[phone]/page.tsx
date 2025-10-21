@@ -11,9 +11,18 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { DateTime } from "luxon";
 
 type Atendimento = {
-  date: string; // já formatada como string
+  date: string;
   time?: string;
   barber: string;
   service: string;
@@ -31,6 +40,8 @@ export default function HistoricoClientePage() {
 
   const [historicos, setHistoricos] = useState<History[]>([]);
   const [loading, setLoading] = useState(true);
+  const [periodo, setPeriodo] = useState<"semana" | "mes" | "ano">("mes");
+  const [barbeiroSelecionado, setBarbeiroSelecionado] = useState("todos");
 
   useEffect(() => {
     if (!phone) return;
@@ -62,6 +73,57 @@ export default function HistoricoClientePage() {
     return atendimentos;
   };
 
+  const calcularTotalPorPeriodo = (
+    historico: History[],
+    periodo: "semana" | "mes" | "ano",
+    barbeiro: string
+  ) => {
+    const agora = DateTime.now().setZone("America/Sao_Paulo");
+    const inicio =
+      periodo === "semana"
+        ? agora.startOf("week")
+        : periodo === "mes"
+        ? agora.startOf("month")
+        : agora.startOf("year");
+
+    let total = 0;
+
+    historico.forEach((h) => {
+      h.dates.forEach((data, index) => {
+        const dataServico = DateTime.fromISO(
+          typeof data === "string" ? data : new Date(data).toISOString()
+        );
+        const barbeiroAtual = h.barbers?.[index];
+        if (
+          dataServico >= inicio &&
+          (barbeiro === "todos" || barbeiroAtual === barbeiro)
+        ) {
+          total += h.prices?.[index] || 0;
+        }
+      });
+    });
+
+    return total;
+  };
+
+  const gerarDadosGrafico = (historico: History[], barbeiro: string) => {
+    const dados: { name: string; valor: number }[] = [];
+
+    historico.forEach((h) => {
+      h.dates.forEach((data, index) => {
+        const barbeiroAtual = h.barbers?.[index];
+        if (barbeiro === "todos" || barbeiroAtual === barbeiro) {
+          dados.push({
+            name: DateTime.fromJSDate(new Date(data)).toFormat("dd/MM"),
+            valor: h.prices?.[index] || 0,
+          });
+        }
+      });
+    });
+
+    return dados;
+  };
+
   if (loading)
     return (
       <div className="p-6 text-white min-h-screen">Carregando histórico...</div>
@@ -76,6 +138,12 @@ export default function HistoricoClientePage() {
   }
 
   const atendimentos = expandHistoricos(historicos);
+  const dadosGrafico = gerarDadosGrafico(historicos, barbeiroSelecionado);
+  const totalPeriodo = calcularTotalPorPeriodo(
+    historicos,
+    periodo,
+    barbeiroSelecionado
+  );
 
   return (
     <div className="min-h-screen flex flex-col p-6">
@@ -86,7 +154,7 @@ export default function HistoricoClientePage() {
         <Button
           variant="outline"
           onClick={() => router.back()}
-          className="text-white bg-zinc-800 border-white">
+          className="text-white bg-zinc-800 border-white cursor-pointer">
           <ArrowLeft size={18} className="mr-2" />
           Voltar
         </Button>
@@ -116,6 +184,77 @@ export default function HistoricoClientePage() {
             </AccordionItem>
           ))}
         </Accordion>
+      </div>
+
+      {/* 🔽 Relatório financeiro com filtros */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold text-white mb-4">
+          Relatório financeiro
+        </h2>
+
+        <div className="flex gap-2 mb-4 flex-wrap">
+          <Button
+            className="cursor-pointer"
+            variant={periodo === "semana" ? "default" : "outline"}
+            onClick={() => setPeriodo("semana")}>
+            Semana
+          </Button>
+          <Button
+            className="cursor-pointer"
+            variant={periodo === "mes" ? "default" : "outline"}
+            onClick={() => setPeriodo("mes")}>
+            Mês
+          </Button>
+          <Button
+            className="cursor-pointer"
+            variant={periodo === "ano" ? "default" : "outline"}
+            onClick={() => setPeriodo("ano")}>
+            Ano
+          </Button>
+        </div>
+
+        <div className="flex gap-2 mb-4 flex-wrap">
+          <Button
+            className="cursor-pointer"
+            variant={barbeiroSelecionado === "todos" ? "default" : "outline"}
+            onClick={() => setBarbeiroSelecionado("todos")}>
+            Todos
+          </Button>
+          <Button
+            className="cursor-pointer"
+            variant={
+              barbeiroSelecionado === "Artista do Corte" ? "default" : "outline"
+            }
+            onClick={() => setBarbeiroSelecionado("Artista do Corte")}>
+            Artista do Corte
+          </Button>
+          <Button
+            className="cursor-pointer"
+            variant={barbeiroSelecionado === "Natan" ? "default" : "outline"}
+            onClick={() => setBarbeiroSelecionado("Natan")}>
+            Natan
+          </Button>
+        </div>
+
+        <p className="text-white mb-2">
+          Total de lucro ({barbeiroSelecionado}) no período:{" "}
+          <span className="font-bold">
+            R${totalPeriodo.toFixed(2).replace(".", ",")}
+          </span>
+        </p>
+
+        <div className="bg-zinc-900 p-4 rounded-lg border border-zinc-700">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dadosGrafico}>
+              <XAxis dataKey="name" stroke="#fff" />
+              <YAxis stroke="#fff" />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#333", color: "#fff" }}
+              />
+              <Bar dataKey="valor" fill="#4f46e5" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

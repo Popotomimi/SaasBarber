@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Bloqueio from "@/interfaces/Bloqueio";
+import { DateTime } from "luxon";
 
 const BloqueioCard = () => {
   const [bloqueios, setBloqueios] = useState<(Bloqueio & { _id: string })[]>(
@@ -92,18 +93,21 @@ const BloqueioCard = () => {
               <strong>Motivo:</strong> {bloqueio.motivo}
             </p>
             <p>
-              <strong>Início:</strong> {bloqueio.startDate} às{" "}
+              <strong>Início:</strong>{" "}
+              {DateTime.fromISO(bloqueio.startDate).toFormat("dd/MM/yyyy")} às{" "}
               {bloqueio.startTime}
             </p>
             <p>
-              <strong>Fim:</strong> {bloqueio.endDate} às {bloqueio.endTime}
+              <strong>Fim:</strong>{" "}
+              {DateTime.fromISO(bloqueio.endDate).toFormat("dd/MM/yyyy")} às{" "}
+              {bloqueio.endTime}
             </p>
           </CardContent>
           <CardFooter className="w-full flex justify-center">
             <Button
               variant="destructive"
               onClick={() => handleDelete(bloqueio._id)}
-              className="flex items-center gap-2">
+              className="flex items-center gap-2 cursor-pointer">
               <Trash2 size={18} />
               Excluir bloqueio
             </Button>
