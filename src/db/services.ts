@@ -11,6 +11,7 @@ export const services = [
     price: 70.0,
   },
   { name: "Penteado R$30,00", duration: 40, price: 30.0 },
+  { name: "Limpeza de pele R$25,00", duration: 20, price: 25.0 },
   { name: "Sobrancelha R$5,00", duration: 15, price: 5.0 },
   { name: "Perfil, acabamento 'Pezinho' R$20,00", duration: 15, price: 20.0 },
   { name: "Selagem R$50,00", duration: 60, price: 50.0 },
