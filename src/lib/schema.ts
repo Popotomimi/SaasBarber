@@ -9,4 +9,6 @@ export const scheduleSchema = z.object({
   phoneNumber: z
     .string()
     .regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Formato inválido. Use (11) 99999-9999"),
+  price: z.number().min(1),
+  duration: z.number().min(1),
 });

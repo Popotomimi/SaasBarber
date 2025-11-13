@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/delete-old-clientes",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

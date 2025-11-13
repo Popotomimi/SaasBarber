@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Cleave from "cleave.js/react";
 import { scheduleSchema } from "../../lib/schema";
 import { z } from "zod";
 import { toast } from "react-toastify";
-import { services } from "@/db/services";
 import { barbers } from "@/db/barbers";
 import { checkAvailability } from "../utils/form/checkAvailability";
 import { fetchClientes } from "../utils/form/fetchClientes";
@@ -32,14 +31,17 @@ import {
 } from "@/components/ui/select";
 import Cliente from "@/interfaces/Cliente";
 import PublicAgendaSelector from "../public-agenda/public-agenda";
+import ServiceSelector from "../service-selector/service-selector";
 
 const FormSchedule = () => {
+  const [resetCounter, setResetCounter] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [selectedService, setSelectedService] = useState<
-    { name: string; duration: number } | undefined
-  >();
-  const [selectedBarber, setSelectedBarber] = useState<string>("");
+  const [selectedService, setSelectedService] = useState<{
+    name: string;
+    duration: number;
+    price: number;
+  }>();
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [showAgenda, setShowAgenda] = useState(true);
 
@@ -52,8 +54,12 @@ const FormSchedule = () => {
       service: "",
       barber: "",
       phoneNumber: "",
+      price: 0,
+      duration: 0,
     },
   });
+
+  const barber = form.watch("barber");
 
   // Recuperar dados do localStorage
   useEffect(() => {
@@ -64,12 +70,18 @@ const FormSchedule = () => {
     if (savedPhone) form.setValue("phoneNumber", savedPhone);
   }, [form]);
 
-  // Gerencia a exibição do seletor de horários
+  // Atualiza exibição da agenda
   useEffect(() => {
-    if (selectedService && selectedBarber && selectedDate) {
-      setShowAgenda(true);
-    }
-  }, [selectedService, selectedBarber, selectedDate]);
+    const shouldShow = !!(selectedService && barber && selectedDate);
+    setShowAgenda((prev) => (prev !== shouldShow ? shouldShow : prev));
+  }, [selectedService, barber, selectedDate]);
+
+  const handleTimeSelect = useCallback(
+    (time: string) => {
+      form.setValue("hora", time);
+    },
+    [form]
+  );
 
   // Enviar agendamento
   async function onSubmit(values: z.infer<typeof scheduleSchema>) {
@@ -78,11 +90,13 @@ const FormSchedule = () => {
       date,
       hora: time,
       service,
-      barber: selectedBarber,
+      barber,
       phoneNumber: phone,
+      duration,
+      price,
     } = values;
 
-    if (!name || !date || !time || !service || !selectedBarber) {
+    if (!name || !date || !time || !service || !barber) {
       toast.warning("Preencha todos os campos.");
       return;
     }
@@ -92,19 +106,14 @@ const FormSchedule = () => {
       date,
       time,
       service,
-      selectedBarber
+      barber
     );
     if (conflictMessage) {
       toast.warning(conflictMessage);
       return;
     }
 
-    const selectedService = services.find((srv) => srv.name === service);
-    if (
-      !selectedService ||
-      !selectedService.duration ||
-      !selectedService.price
-    ) {
+    if (!duration || !price) {
       toast.warning("Serviço inválido.");
       return;
     }
@@ -113,10 +122,10 @@ const FormSchedule = () => {
       name,
       date,
       time,
-      service: selectedService.name,
-      duration: selectedService.duration,
-      price: selectedService.price,
-      barber: selectedBarber,
+      service,
+      duration,
+      price,
+      barber,
       phone,
     };
 
@@ -136,18 +145,12 @@ const FormSchedule = () => {
       }
 
       toast.success("Agendamento realizado com sucesso!");
+      setResetCounter((prev) => prev + 1);
       localStorage.setItem("userName", name);
       localStorage.setItem("userPhone", phone);
-      form.reset({
-        name: "",
-        date: "",
-        hora: "",
-        service: "",
-        barber: "",
-        phoneNumber: "",
-      });
-      form.setValue("service", "");
-      form.setValue("barber", "");
+      form.reset();
+      setSelectedService(undefined);
+      setSelectedDate("");
       setShowAgenda(false);
       window.dispatchEvent(new Event("agendaAtualizada"));
       fetchClientes().then(setClientes);
@@ -208,38 +211,19 @@ const FormSchedule = () => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="service"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm text-gray-300">Serviço</FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    const found = services.find((s) => s.name === value);
-                    setSelectedService(found);
-                  }}>
-                  <FormControl>
-                    <SelectTrigger className="w-full bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition">
-                      <SelectValue placeholder="Escolha o serviço" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="bg-[#1a1a1a] text-white">
-                    {services.map((service) => (
-                      <SelectItem
-                        key={service.name}
-                        value={service.name}
-                        className="hover:bg-[#333] cursor-pointer">
-                        {service.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+          <ServiceSelector
+            resetTrigger={resetCounter}
+            onChange={(selected, totalPrice, totalDuration) => {
+              const serviceNames = selected.map((s) => s.name).join(", ");
+              form.setValue("service", serviceNames);
+              form.setValue("price", totalPrice);
+              form.setValue("duration", totalDuration);
+              setSelectedService({
+                name: serviceNames,
+                price: totalPrice,
+                duration: totalDuration,
+              });
+            }}
           />
 
           <FormField
@@ -250,12 +234,7 @@ const FormSchedule = () => {
                 <FormLabel className="text-sm text-gray-300">
                   Barbeiro
                 </FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    setSelectedBarber(value);
-                  }}>
+                <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger className="w-full bg-[#222] text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white transition">
                       <SelectValue placeholder="Escolha o barbeiro" />
@@ -280,9 +259,9 @@ const FormSchedule = () => {
           {showAgenda && (
             <PublicAgendaSelector
               selectedService={selectedService}
-              selectedBarber={selectedBarber}
+              selectedBarber={barber}
               selectedDate={selectedDate}
-              onTimeSelect={(time) => form.setValue("hora", time)}
+              onTimeSelect={handleTimeSelect}
             />
           )}
 
@@ -315,11 +294,11 @@ const FormSchedule = () => {
             type="submit"
             disabled={isButtonDisabled}
             className={`w-full cursor-pointer font-semibold py-3 rounded-md transition
-    ${
-      isButtonDisabled
-        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-        : "bg-white text-black hover:bg-blue-400"
-    }
+              ${
+                isButtonDisabled
+                  ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  : "bg-white text-black hover:bg-blue-400"
+              }
   `}>
             {isButtonDisabled ? "Aguarde..." : "Agendar"}
           </Button>
