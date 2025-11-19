@@ -3,6 +3,7 @@ import AdminAgenda from "@/components/admin-agenda/admin-agenda";
 import AdminFormSchedule from "@/components/admin-form-schedule/admin-form-schedule";
 import BloqueioCard from "@/components/bloqueio-card/bloqueio-card";
 import FormBlock from "@/components/form-block/form-block";
+import FormSchedule from "@/components/form-schedule/form-schedule";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -53,11 +54,10 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Seções separadas */}
       <div
         className="w-full max-w-screen-md border-t border-gray-700 py-12"
         id="agenda">
-        <AdminFormSchedule />
+        <FormSchedule />
       </div>
 
       <div

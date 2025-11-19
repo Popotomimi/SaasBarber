@@ -83,7 +83,7 @@ const ServiceSelector = ({ onChange, resetTrigger }: Props) => {
           <button
             onClick={() => setMode("chemistry")}
             className="bg-red-500 cursor-pointer text-white px-4 py-2 rounded-md">
-            Química
+            Química + Corte
           </button>
         </div>
       )}
@@ -100,7 +100,7 @@ const ServiceSelector = ({ onChange, resetTrigger }: Props) => {
 
       {mode === "chemistry" && (
         <>
-          {renderOptions("Químicas", chemistry)}
+          {renderOptions("Químicas + Corte", chemistry)}
           {selectedServices.some((s) =>
             chemistry.some((q) => q.name === s.name)
           ) && renderOptions("Adicionais", additionalServices)}

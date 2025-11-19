@@ -1,21 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
-import QRCode from "react-qr-code";
+import { useEffect, useState, useRef } from "react";
 import { CheckCircle, QrCode, Loader2 } from "lucide-react";
 import Image from "next/image";
 
 export default function QRPage() {
   const [qr, setQr] = useState("");
   const [connected, setConnected] = useState(false);
-  const [loading, setLoading] = useState(true); // estado para "inicializando..."
+  const [loading, setLoading] = useState(true);
+  const lastQrRef = useRef(""); // para comparar QR anterior
+  const attemptsRef = useRef(0); // para limitar tentativas
 
   const fetchQR = async () => {
     try {
       const res = await fetch("https://saasbarberbackend.onrender.com/qrcode");
 
-      if (!res.ok) {
-        throw new Error(`Erro HTTP: ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
 
       const data = await res.json();
       console.log("Resposta do backend:", data);
@@ -27,8 +26,18 @@ export default function QRPage() {
       }
 
       if (data.status === "aguardando leitura" && data.qrcode) {
-        setQr(data.qrcode);
+        setConnected(false);
         setLoading(false);
+
+        // Se o QR Code mudou, atualiza
+        if (lastQrRef.current !== data.qrcode) {
+          lastQrRef.current = data.qrcode;
+          setQr(data.qrcode);
+          attemptsRef.current = 0; // reseta tentativas
+        } else {
+          attemptsRef.current++;
+        }
+
         return;
       }
 
@@ -50,7 +59,15 @@ export default function QRPage() {
 
   useEffect(() => {
     fetchQR();
-    const intervalId = setInterval(fetchQR, 3000);
+    const intervalId = setInterval(() => {
+      if (attemptsRef.current >= 10) {
+        console.warn("QR Code não mudou após 10 tentativas. Interrompendo.");
+        clearInterval(intervalId);
+        return;
+      }
+      fetchQR();
+    }, 3000);
+
     return () => clearInterval(intervalId);
   }, []);
 

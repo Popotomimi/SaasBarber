@@ -10,8 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Cliente from "@/interfaces/Cliente";
-import { services } from "@/db/services";
 import { barbers } from "@/db/barbers";
+import ServiceSelector from "../service-selector/service-selector";
 
 interface Props {
   cliente: Cliente | null;
@@ -38,7 +38,7 @@ const Modal: React.FC<Props> = ({
 }) => {
   return (
     <Dialog open={!!cliente} onOpenChange={onClose}>
-      <DialogContent className="bg-[#1a1a1a] text-white">
+      <DialogContent className="bg-[#1a1a1a] text-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Agendamento</DialogTitle>
         </DialogHeader>
@@ -56,32 +56,17 @@ const Modal: React.FC<Props> = ({
             onChange={(e) => setFormData({ ...formData, time: e.target.value })}
           />
 
-          <select
-            value={formData.service}
-            onChange={(e) => {
-              const selected = services.find((s) => s.name === e.target.value);
-              const priceMatch = selected?.name.match(
-                /R\$\s?(\d+[\.,]?\d{0,2})/
-              );
-              const extractedPrice = priceMatch
-                ? parseFloat(priceMatch[1].replace(",", "."))
-                : 0;
-
+          <ServiceSelector
+            onChange={(selected, totalPrice, totalDuration) => {
+              const serviceNames = selected.map((s) => s.name).join(", ");
               setFormData({
                 ...formData,
-                service: selected?.name || "",
-                duration: selected?.duration || 0,
-                price: extractedPrice,
+                service: serviceNames,
+                price: totalPrice,
+                duration: totalDuration,
               });
             }}
-            className="w-full px-3 py-2 bg-[#2a2a2a] text-white rounded">
-            <option value="">Selecione um serviço</option>
-            {services.map((s) => (
-              <option key={s.name} value={s.name}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          />
 
           <select
             value={formData.barber}

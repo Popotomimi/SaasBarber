@@ -18,6 +18,16 @@ const productList = [
   "agua",
 ];
 
+function formatProductName(name: string): string {
+  return name
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .replace(/Cocacola/i, "Coca-Cola")
+    .replace(/Guarana/i, "Guaraná")
+    .replace(/Agua/i, "Água")
+    .trim();
+}
+
 const StockManage = () => {
   const [stock, setStock] = useState<Record<string, number>>({});
 
@@ -44,7 +54,6 @@ const StockManage = () => {
   };
 
   const handleSubmit = async () => {
-    // Filtra apenas os campos com valores numéricos válidos
     const payload: Record<string, number> = {};
     for (const key of productList) {
       const value = stock[key];
@@ -80,7 +89,7 @@ const StockManage = () => {
             key={item}
             className="flex flex-col mb-10 md:flex-row md:items-center md:gap-4 gap-2 justify-between">
             <label className="md:w-40 w-full capitalize font-medium">
-              {item}
+              {formatProductName(item)}
             </label>
             <div className="flex items-center gap-2">
               <Button
