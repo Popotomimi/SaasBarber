@@ -18,13 +18,16 @@ const SearchAppointment = () => {
   const [phone, setPhone] = useState("");
   const [result, setResult] = useState<Cliente | null>(null);
   const [searched, setSearched] = useState(false);
+  const [loading, setLoading] = useState(false); // novo estado
 
   const handleSearch = async () => {
     setResult(null);
-    setSearched(true);
+    setSearched(false);
+    setLoading(true);
 
     if (!phone) {
       toast.error("Digite um número de telefone!");
+      setLoading(false);
       return;
     }
 
@@ -40,6 +43,9 @@ const SearchAppointment = () => {
       }
     } catch (err) {
       toast.error("Erro na requisição");
+    } finally {
+      setLoading(false);
+      setSearched(true);
     }
   };
 
@@ -67,12 +73,28 @@ const SearchAppointment = () => {
 
         <button
           onClick={handleSearch}
-          className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center gap-2 animate-jump-in">
-          <Search className="w-5 h-5" /> Buscar
+          disabled={loading}
+          className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center gap-2 animate-jump-in disabled:opacity-50 disabled:cursor-not-allowed">
+          {loading ? (
+            <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+          ) : (
+            <>
+              <Search className="w-5 h-5" /> Buscar
+            </>
+          )}
         </button>
       </div>
 
-      {result ? (
+      {/* Loading */}
+      {loading && (
+        <div className="mt-6 flex items-center justify-center text-blue-400 gap-2 animate-pulse">
+          <Search className="w-5 h-5 animate-spin" />
+          <span>Buscando agendamento...</span>
+        </div>
+      )}
+
+      {/* Resultado */}
+      {result && !loading && (
         <div className="mt-6 p-6 rounded-lg bg-gradient-to-br from-[#111] to-[#2a2a2a] border border-gray-700 shadow-xl space-y-4 animate-fade-in-up">
           <p className="flex items-center gap-2 text-gray-200">
             <Calendar className="w-5 h-5 text-blue-400 drop-shadow" />
@@ -92,13 +114,14 @@ const SearchAppointment = () => {
             <span className="font-semibold">Barbeiro:</span> {result.barber}
           </p>
         </div>
-      ) : (
-        searched && (
-          <div className="mt-6 flex items-center gap-2 text-red-400 justify-center animate-shake">
-            <AlertCircle className="w-5 h-5" />
-            <span>Nenhum agendamento encontrado</span>
-          </div>
-        )
+      )}
+
+      {/* Nenhum resultado */}
+      {!result && searched && !loading && (
+        <div className="mt-6 flex items-center gap-2 text-red-400 justify-center animate-shake">
+          <AlertCircle className="w-5 h-5" />
+          <span>Nenhum agendamento encontrado</span>
+        </div>
       )}
     </div>
   );
