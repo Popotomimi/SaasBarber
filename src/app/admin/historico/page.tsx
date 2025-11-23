@@ -11,31 +11,17 @@ import {
 } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
 import History from "@/interfaces/History";
-import { Button } from "@/components/ui/button";
 import BackAdmin from "@/components/back/back";
 import { DateTime } from "luxon";
 
 export default function HistoricoPage() {
   const [historicos, setHistoricos] = useState<History[]>([]);
-  const [periodo, setPeriodo] = useState<"semana" | "mes" | "ano">("mes");
+  const hoje = DateTime.now().setZone("America/Sao_Paulo");
+  const [dataInicial, setDataInicial] = useState<DateTime | null>(
+    hoje.minus({ days: 7 })
+  );
+  const [dataFinal, setDataFinal] = useState<DateTime | null>(hoje);
   const router = useRouter();
-
-  useEffect(() => {
-    fetch("/api/history")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setHistoricos(data);
-        } else {
-          console.error("Resposta inesperada da API:", data);
-          setHistoricos([]);
-        }
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar históricos:", err);
-        setHistoricos([]);
-      });
-  }, []);
 
   useEffect(() => {
     const atualizar = () => {
@@ -45,15 +31,17 @@ export default function HistoricoPage() {
           if (Array.isArray(data)) {
             setHistoricos(data);
           } else {
+            console.error("Resposta inesperada da API:", data);
             setHistoricos([]);
           }
+        })
+        .catch((err) => {
+          console.error("Erro ao buscar históricos:", err);
+          setHistoricos([]);
         });
     };
 
-    // Carregamento inicial
     atualizar();
-
-    // Escuta o evento global
     window.addEventListener("agendaAtualizada", atualizar);
 
     return () => {
@@ -61,7 +49,6 @@ export default function HistoricoPage() {
     };
   }, []);
 
-  // Protege contra dados inválidos
   const clientesUnicos = Array.isArray(historicos)
     ? Object.values(
         historicos.reduce((acc: Record<string, History>, h) => {
@@ -79,15 +66,10 @@ export default function HistoricoPage() {
   const calcularLucroPorBarbeiro = (
     historico: History[],
     barbeiro: string,
-    periodo: "semana" | "mes" | "ano"
+    inicio: DateTime | null,
+    fim: DateTime | null
   ) => {
-    const agora = DateTime.now().setZone("America/Sao_Paulo");
-    const inicio =
-      periodo === "semana"
-        ? agora.startOf("week")
-        : periodo === "mes"
-        ? agora.startOf("month")
-        : agora.startOf("year");
+    if (!inicio || !fim) return 0;
 
     let total = 0;
 
@@ -95,12 +77,14 @@ export default function HistoricoPage() {
       h.dates.forEach((data, index) => {
         const dataServico = DateTime.fromJSDate(new Date(data));
         const barbeiroAtual = h.barbers?.[index];
+        const preco = h.prices?.[index] ?? 0;
+
         if (
           dataServico >= inicio &&
-          barbeiroAtual === barbeiro &&
-          h.prices?.[index]
+          dataServico <= fim &&
+          barbeiroAtual === barbeiro
         ) {
-          total += h.prices[index];
+          total += preco;
         }
       });
     });
@@ -108,11 +92,17 @@ export default function HistoricoPage() {
     return total;
   };
 
-  const lucroNatan = calcularLucroPorBarbeiro(historicos, "Natan", periodo);
+  const lucroNatan = calcularLucroPorBarbeiro(
+    historicos,
+    "Natan",
+    dataInicial,
+    dataFinal
+  );
   const lucroArtista = calcularLucroPorBarbeiro(
     historicos,
     "Artista do Corte",
-    periodo
+    dataInicial,
+    dataFinal
   );
 
   return (
@@ -154,31 +144,28 @@ export default function HistoricoPage() {
         </Table>
       </div>
 
-      {/* 🔽 Painel de lucro por barbeiro */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold text-white mb-4">
           Lucro por barbeiro
         </h2>
 
-        <div className="flex gap-2 mb-4">
-          <Button
-            className="cursor-pointer"
-            variant={periodo === "semana" ? "default" : "outline"}
-            onClick={() => setPeriodo("semana")}>
-            Semana
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant={periodo === "mes" ? "default" : "outline"}
-            onClick={() => setPeriodo("mes")}>
-            Mês
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant={periodo === "ano" ? "default" : "outline"}
-            onClick={() => setPeriodo("ano")}>
-            Ano
-          </Button>
+        <div className="flex gap-6 mb-4">
+          <div className="flex flex-col">
+            <label className="text-white mb-1">Data de início</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white p-2 rounded"
+              onChange={(e) => setDataInicial(DateTime.fromISO(e.target.value))}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-white mb-1">Data de fim</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white p-2 rounded"
+              onChange={(e) => setDataFinal(DateTime.fromISO(e.target.value))}
+            />
+          </div>
         </div>
 
         <div className="rounded-lg overflow-hidden border border-zinc-700">

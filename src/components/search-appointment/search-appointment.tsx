@@ -50,7 +50,7 @@ const SearchAppointment = () => {
   };
 
   return (
-    <div className="w-[90%] md:max-w-2xl mx-auto text-white p-6 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] shadow-lg rounded-xl animate-fade-in">
+    <div className="w-[90%] md:max-w-2xl mx-auto mb-5 text-white p-6 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] shadow-lg rounded-xl animate-fade-in">
       <h2 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2 animate-bounce-in">
         <Search className="w-8 h-8 text-blue-400 animate-pulse" />
         Buscar Agendamento

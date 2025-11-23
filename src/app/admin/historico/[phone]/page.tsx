@@ -40,8 +40,14 @@ export default function HistoricoClientePage() {
 
   const [historicos, setHistoricos] = useState<History[]>([]);
   const [loading, setLoading] = useState(true);
-  const [periodo, setPeriodo] = useState<"semana" | "mes" | "ano">("mes");
   const [barbeiroSelecionado, setBarbeiroSelecionado] = useState("todos");
+
+  // datas com default de última semana
+  const hoje = DateTime.now().setZone("America/Sao_Paulo");
+  const [dataInicial, setDataInicial] = useState<DateTime>(
+    hoje.minus({ days: 7 })
+  );
+  const [dataFinal, setDataFinal] = useState<DateTime>(hoje);
 
   useEffect(() => {
     if (!phone) return;
@@ -75,17 +81,10 @@ export default function HistoricoClientePage() {
 
   const calcularTotalPorPeriodo = (
     historico: History[],
-    periodo: "semana" | "mes" | "ano",
+    inicio: DateTime,
+    fim: DateTime,
     barbeiro: string
   ) => {
-    const agora = DateTime.now().setZone("America/Sao_Paulo");
-    const inicio =
-      periodo === "semana"
-        ? agora.startOf("week")
-        : periodo === "mes"
-        ? agora.startOf("month")
-        : agora.startOf("year");
-
     let total = 0;
 
     historico.forEach((h) => {
@@ -96,6 +95,7 @@ export default function HistoricoClientePage() {
         const barbeiroAtual = h.barbers?.[index];
         if (
           dataServico >= inicio &&
+          dataServico <= fim &&
           (barbeiro === "todos" || barbeiroAtual === barbeiro)
         ) {
           total += h.prices?.[index] || 0;
@@ -112,9 +112,14 @@ export default function HistoricoClientePage() {
     historico.forEach((h) => {
       h.dates.forEach((data, index) => {
         const barbeiroAtual = h.barbers?.[index];
-        if (barbeiro === "todos" || barbeiroAtual === barbeiro) {
+        const dataServico = DateTime.fromJSDate(new Date(data));
+        if (
+          dataServico >= dataInicial &&
+          dataServico <= dataFinal &&
+          (barbeiro === "todos" || barbeiroAtual === barbeiro)
+        ) {
           dados.push({
-            name: DateTime.fromJSDate(new Date(data)).toFormat("dd/MM"),
+            name: dataServico.toFormat("dd/MM"),
             valor: h.prices?.[index] || 0,
           });
         }
@@ -141,7 +146,8 @@ export default function HistoricoClientePage() {
   const dadosGrafico = gerarDadosGrafico(historicos, barbeiroSelecionado);
   const totalPeriodo = calcularTotalPorPeriodo(
     historicos,
-    periodo,
+    dataInicial,
+    dataFinal,
     barbeiroSelecionado
   );
 
@@ -192,25 +198,26 @@ export default function HistoricoClientePage() {
           Relatório financeiro
         </h2>
 
-        <div className="flex gap-2 mb-4 flex-wrap">
-          <Button
-            className="cursor-pointer"
-            variant={periodo === "semana" ? "default" : "outline"}
-            onClick={() => setPeriodo("semana")}>
-            Semana
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant={periodo === "mes" ? "default" : "outline"}
-            onClick={() => setPeriodo("mes")}>
-            Mês
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant={periodo === "ano" ? "default" : "outline"}
-            onClick={() => setPeriodo("ano")}>
-            Ano
-          </Button>
+        {/* Inputs de data com labels */}
+        <div className="flex gap-6 mb-4 flex-wrap">
+          <div className="flex flex-col">
+            <label className="text-white mb-1">Data de início</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white p-2 rounded"
+              value={dataInicial.toISODate() || ""}
+              onChange={(e) => setDataInicial(DateTime.fromISO(e.target.value))}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-white mb-1">Data de fim</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white p-2 rounded"
+              value={dataFinal.toISODate() || ""}
+              onChange={(e) => setDataFinal(DateTime.fromISO(e.target.value))}
+            />
+          </div>
         </div>
 
         <div className="flex gap-2 mb-4 flex-wrap">
