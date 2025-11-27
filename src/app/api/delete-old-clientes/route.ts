@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 export async function GET(req: NextRequest) {
   await connectToDatabase();
 
-  const doisDiasAtras = DateTime.now()
+  /*const doisDiasAtras = DateTime.now()
     .setZone("America/Sao_Paulo")
     .minus({ days: 2 })
     .startOf("day");
@@ -18,5 +18,5 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(
     { message: `Clientes excluídos: ${result.deletedCount}` },
     { status: 200 }
-  );
+  );*/
 }
