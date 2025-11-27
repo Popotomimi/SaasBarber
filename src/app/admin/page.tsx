@@ -39,7 +39,7 @@ export default function AdminPage() {
           <Button
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
             asChild>
-            <Link href="/admin/historico">Hitorico de Clientes</Link>
+            <Link href="/admin/historico">Histórico de Clientes</Link>
           </Button>
           <Button
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"

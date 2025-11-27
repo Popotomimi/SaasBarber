@@ -5,7 +5,7 @@ export const combos = [
     duration: 120,
   },
   {
-    name: "Patrono 2: Corte, barba, sobrancelha, higratação, limpeza de pele e penteado",
+    name: "Patrono 2: Corte, barba, sobrancelha, hidratação, limpeza de pele e penteado",
     price: 120,
     duration: 120,
   },
