@@ -18,7 +18,7 @@ export default function HistoricoPage() {
   const [historicos, setHistoricos] = useState<History[]>([]);
   const hoje = DateTime.now().setZone("America/Sao_Paulo");
   const [dataInicial, setDataInicial] = useState<DateTime | null>(
-    hoje.minus({ days: 7 })
+    hoje.minus({ days: 7 }),
   );
   const [dataFinal, setDataFinal] = useState<DateTime | null>(hoje);
   const router = useRouter();
@@ -59,7 +59,7 @@ export default function HistoricoPage() {
             acc[normalized].amount += h.amount;
           }
           return acc;
-        }, {})
+        }, {}),
       )
     : [];
 
@@ -67,7 +67,7 @@ export default function HistoricoPage() {
     historico: History[],
     barbeiro: string,
     inicio: DateTime | null,
-    fim: DateTime | null
+    fim: DateTime | null,
   ) => {
     if (!inicio || !fim) return 0;
 
@@ -92,22 +92,67 @@ export default function HistoricoPage() {
     return total;
   };
 
+  /*
   const lucroNatan = calcularLucroPorBarbeiro(
     historicos,
     "Natan",
     dataInicial,
-    dataFinal
-  );
+    dataFinal,
+  );*/
+
   const lucroArtista = calcularLucroPorBarbeiro(
     historicos,
     "Artista do Corte",
     dataInicial,
-    dataFinal
+    dataFinal,
   );
 
   return (
     <div className="min-h-screen p-6">
       <BackAdmin />
+      <div className="my-8">
+        <h2 className="text-xl font-semibold text-white mb-4">
+          Lucro por barbeiro
+        </h2>
+
+        <div className="flex gap-6 mb-4">
+          <div className="flex flex-col">
+            <label className="text-white mb-1">Data de início</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white p-2 rounded"
+              onChange={(e) => setDataInicial(DateTime.fromISO(e.target.value))}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-white mb-1">Data de fim</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white p-2 rounded"
+              onChange={(e) => setDataFinal(DateTime.fromISO(e.target.value))}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-lg overflow-hidden border border-zinc-700">
+          <Table className="bg-zinc-800 text-white">
+            <TableHeader className="bg-zinc-900">
+              <TableRow>
+                <TableHead className="text-white">Barbeiro</TableHead>
+                <TableHead className="text-white">Lucro no período</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>Artista do Corte</TableCell>
+                <TableCell>
+                  R${lucroArtista.toFixed(2).replace(".", ",")}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
       <h1 className="text-2xl font-bold mb-4 text-white">
         Histórico de Clientes
       </h1>
@@ -142,56 +187,6 @@ export default function HistoricoPage() {
             })}
           </TableBody>
         </Table>
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold text-white mb-4">
-          Lucro por barbeiro
-        </h2>
-
-        <div className="flex gap-6 mb-4">
-          <div className="flex flex-col">
-            <label className="text-white mb-1">Data de início</label>
-            <input
-              type="date"
-              className="bg-zinc-800 text-white p-2 rounded"
-              onChange={(e) => setDataInicial(DateTime.fromISO(e.target.value))}
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-white mb-1">Data de fim</label>
-            <input
-              type="date"
-              className="bg-zinc-800 text-white p-2 rounded"
-              onChange={(e) => setDataFinal(DateTime.fromISO(e.target.value))}
-            />
-          </div>
-        </div>
-
-        <div className="rounded-lg overflow-hidden border border-zinc-700">
-          <Table className="bg-zinc-800 text-white">
-            <TableHeader className="bg-zinc-900">
-              <TableRow>
-                <TableHead className="text-white">Barbeiro</TableHead>
-                <TableHead className="text-white">Lucro no período</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Natan</TableCell>
-                <TableCell>
-                  R${lucroNatan.toFixed(2).replace(".", ",")}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Artista do Corte</TableCell>
-                <TableCell>
-                  R${lucroArtista.toFixed(2).replace(".", ",")}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
       </div>
     </div>
   );
