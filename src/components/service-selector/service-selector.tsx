@@ -14,7 +14,7 @@ interface Props {
   onChange: (
     selected: Service[],
     totalPrice: number,
-    totalDuration: number
+    totalDuration: number,
   ) => void;
   resetTrigger?: number;
 }
@@ -38,12 +38,17 @@ const ServiceSelector = ({ onChange, resetTrigger }: Props) => {
     setSelectedServices(updated);
   };
 
+  const getServiceDuration = (service: Service) => {
+    if (service.name === "Acabamento (Pezinho)") return 30;
+    if (["Corte", "Barba", "Penteado"].includes(service.name)) return 60;
+    return service.duration;
+  };
+
   useEffect(() => {
     const totalPrice = selectedServices.reduce((acc, s) => acc + s.price, 0);
-    const totalDuration = selectedServices.reduce(
-      (acc, s) => acc + s.duration,
-      0
-    );
+    const totalDuration = selectedServices.length
+      ? Math.max(...selectedServices.map((s) => s.duration))
+      : 0;
     if (typeof onChange === "function") {
       onChange(selectedServices, totalPrice, totalDuration);
     }
@@ -93,7 +98,7 @@ const ServiceSelector = ({ onChange, resetTrigger }: Props) => {
           {renderOptions("Combos", combos)}
           {renderOptions("Serviços", services)}
           {selectedServices.some((s) =>
-            services.some((base) => base.name === s.name)
+            services.some((base) => base.name === s.name),
           ) && renderOptions("Adicionais", additionalServices)}
         </>
       )}
@@ -102,7 +107,7 @@ const ServiceSelector = ({ onChange, resetTrigger }: Props) => {
         <>
           {renderOptions("Químicas + Corte", chemistry)}
           {selectedServices.some((s) =>
-            chemistry.some((q) => q.name === s.name)
+            chemistry.some((q) => q.name === s.name),
           ) && renderOptions("Adicionais", additionalServices)}
         </>
       )}
